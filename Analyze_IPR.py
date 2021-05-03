@@ -102,34 +102,34 @@ def Read_average_coupling_strength_and_local_density_of_state(folder_path):
         data = f.readlines()
         datalen = len(data)
 
-        line = data[0]
+        line = data[0].strip('\n')
         line = re.split(' ', line)
         state_num = int(line[0])
 
-        line = data[1]
+        line = data[1].strip('\n')
         line = re.split(' ',line)
-        rho_local_same = [float(i) for i in line]
+        rho_local_same = [float(i) for i in line if i!='']
         rho_local_same = np.array(rho_local_same)
 
-        line = data[2]
+        line = data[2].strip('\n')
         line = re.split(' ',line)
-        rho_local_another = [float(i) for i in line]
+        rho_local_another = [float(i) for i in line if i!='']
         rho_local_another = np.array(rho_local_another)
 
-        line = data[3]
+        line = data[3].strip('\n')
         line = re.split(' ',line)
-        V_average_same = [float(i) for i in line]
+        V_average_same = [float(i) for i in line if i!='']
         V_average_same = np.array(V_average_same)
 
-        line = data[4]
+        line = data[4].strip('\n')
         line = re.split(' ',line)
-        V_average_another = [float(i) for i in line]
+        V_average_another = [float(i) for i in line if i!='']
         V_average_another = np.array(V_average_another)
 
         line_index = 5
         Mode_number_list = []
         for i in range(state_num):
-            line = data[line_index]
+            line = data[line_index].strip('\n')
             line = re.split(' ',line)
             mode_num = [int(i) for i in line if i!='']
             Mode_number_list.append(mode_num)
@@ -138,7 +138,7 @@ def Read_average_coupling_strength_and_local_density_of_state(folder_path):
         Criteria_T_same = 2*np.pi / 3 * pow(V_average_same * rho_local_same,2)
         Criteria_T_another = 2 * np.pi /3 * pow(V_average_another * rho_local_another ,2 )
 
-        return Mode_number_list , rho_local_same, rho_local_another, V_average_same, V_average_another
+        return Mode_number_list , rho_local_same, rho_local_another, V_average_same, V_average_another , Criteria_T_same, Criteria_T_another
 
 
 

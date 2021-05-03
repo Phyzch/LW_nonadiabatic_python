@@ -7,8 +7,8 @@ def Generate_input_files(folder_path):
     sampling_state_index_file_path = os.path.join(folder_path, "sampling_state_info.txt")
     input_file_path = os.path.join(folder_path, "input.txt")
 
-    tunneling_strength = [0, 100 ,  200 , 300 ]
-    scaling_factor = [ 0.1 , 0.11, 0.12 , 0.13, 0.14]
+    tunneling_strength = [0, 100 ,  200 , 300 , 500 , 1000 ]
+    scaling_factor = [ 0.1 , 0.12, 0.15, 0.18, 0.2, 0.25 , 0.3]
 
     tunneling_num = len(tunneling_strength)
     scaling_num = len(scaling_factor)

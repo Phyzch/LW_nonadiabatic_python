@@ -14,10 +14,10 @@ from Analyze_Multiple_result import Analyze_multiple_simulation_result
 def main():
     # plot_simulation_result()
 
-    # Analyze_multiple_simulation_result()
+    Analyze_multiple_simulation_result()
 
-    input_folder_path ="/home/phyzch/CLionProjects/4_point_correlation_calculation/result/spin_boson_LW_model/try/"
-    Generate_input_files(input_folder_path)
+    # input_folder_path ="/home/phyzch/CLionProjects/4_point_correlation_calculation/result/spin_boson_LW_model/Bathc_simulation_new/"
+    # Generate_input_files(input_folder_path)
 
 def plot_simulation_result():
 

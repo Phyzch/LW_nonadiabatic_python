@@ -3,18 +3,18 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from Generate_input_file import Generate_input_files
-from Analyze_IPR import Analyze_IPR_all_state,Read_IPR_all_state, Read_local_density_of_state , Search_state
+from Analyze_IPR import Analyze_IPR_all_state,Read_IPR_all_state, Read_local_density_of_state , Search_state, Read_average_coupling_strength_and_local_density_of_state
 
 
 def Analyze_multiple_simulation_result():
     matplotlib.rcParams.update({'font.size': 15})
-    parent_file_path = "/home/phyzch/CLionProjects/4_point_correlation_calculation/result/spin_boson_LW_model/Batch_simulation_simple/"
+    parent_file_path = "/home/phyzch/CLionProjects/4_point_correlation_calculation/result/spin_boson_LW_model/Batch_simulation_new/"
 
-    tunneling_strength = [0, 100 , 200 ]
-    scaling_factor = [ 0.1 , 0.11, 0.12 , 0.13, 0.14]
+    tunneling_strength = [0, 100 , 200 , 300 , 500, 1000 ]
+    scaling_factor = [ 0.1 , 0.12, 0.15 , 0.18, 0.2 , 0.25, 0.3]
 
-    scaling_num = 5
-    tunneling_coupling_num = 3
+    scaling_num = len(scaling_factor)
+    tunneling_coupling_num = len(tunneling_strength)
 
     # should in the form [ [same electronic_tunneling_strength] , [same electronic_tunneling_strength] , etc ]
     subfolder_path_list = []
@@ -62,6 +62,17 @@ def Analyze_multiple_simulation_result():
         local_density_of_state_same_list.append(local_density_of_state_same)
         local_density_of_state_another_list.append(local_density_of_state_another)
 
+    Criteria_T_same_list = []
+    Criteria_T_another_list = []
+    for i in range(file_num):
+        Mode_number_list, rho_local_same, rho_local_another, V_average_same, V_average_another, \
+        Criteria_T_same, Criteria_T_another \
+        = Read_average_coupling_strength_and_local_density_of_state(path_list[i])
+
+        Criteria_T_same_list.append(Criteria_T_same)
+        Criteria_T_another_list.append(Criteria_T_another)
+
+
 
     Crossing_point_state = [1, 0, 2, 2, 1, 1, 1 ]
     Crossing_point_complementary = [0, 9, 2, 2, 1, 1, 1 ]
@@ -85,6 +96,13 @@ def Analyze_multiple_simulation_result():
         complementary_local_density_of_state_same_for_state =[]
         complementary_local_density_of_state_another_for_state = []
 
+        # T and T' for two state
+        T_state1 = []
+        T_state2 = []
+
+        T_prime_state1 = []
+        T_prime_state2 = []
+
         for i in range(file_num):
             local_density_of_state_same_for_state.append(local_density_of_state_same_list[i][position])
             local_density_of_state_another_for_state.append(local_density_of_state_another_list[i][position])
@@ -92,11 +110,17 @@ def Analyze_multiple_simulation_result():
             complementary_local_density_of_state_same_for_state.append(local_density_of_state_same_list[i][complementary_position])
             complementary_local_density_of_state_another_for_state.append(local_density_of_state_another_list[i][complementary_position])
 
+            T_state1.append(Criteria_T_same_list[i][position])
+            T_state2.append(Criteria_T_same_list[i][complementary_position])
+
+            T_prime_state1.append(Criteria_T_another_list[i][position])
+            T_prime_state2.append(Criteria_T_another_list[i][complementary_position])
+
         print(complementary_local_density_of_state_same_for_state)
         print(complementary_local_density_of_state_another_for_state)
 
         fig , ax = plt.subplots(nrows=1, ncols=1)
-        color_list = ['blue' , 'red' ,'green' , 'purple']
+        color_list = ['blue' , 'orange' ,'green' , 'red', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan']
         for i in range(tunneling_coupling_num):
             # with same tunneling, we should have same local_density_of_state_another in this case
             local_density_of_state_same_for_state_slice = local_density_of_state_same_for_state[i * scaling_num : (i+1) * scaling_num]
@@ -132,18 +156,17 @@ def Analyze_multiple_simulation_result():
         for i in range(tunneling_coupling_num):
             final_IPR_for_state_slice = final_IPR_for_state[i * scaling_num: (i + 1) * scaling_num]
             # T1
-            T1 = np.array(local_density_of_state_same_for_state[
-                                                          i * scaling_num: (i + 1) * scaling_num])
+            T1 = np.array(T_state1[i * scaling_num: (i + 1) * scaling_num])
             # T1'
-            T1_tilde =  np.array(local_density_of_state_another_for_state[i * scaling_num : (i + 1) * scaling_num ])
+            T1_tilde =  np.array(T_prime_state1[i * scaling_num : (i + 1) * scaling_num ])
 
             # T2
-            T2 = np.array (complementary_local_density_of_state_same_for_state[i * scaling_num: (i + 1) * scaling_num] )
+            T2 = np.array (T_state2[i * scaling_num: (i + 1) * scaling_num] )
 
             # T2'
-            T2_tilde = np.array( complementary_local_density_of_state_another_for_state[i * scaling_num : (i + 1) * scaling_num ] )
+            T2_tilde = np.array( T_prime_state2[i * scaling_num : (i + 1) * scaling_num ] )
 
-            qualified_index = [ i for i in range(scaling_num) if T2[i] < 0.95 ]
+            qualified_index = [ i for i in range(scaling_num) if T2[i] < 0.95 and T1[i] < 0.95 ]
 
             Criteria = T1_tilde[qualified_index] * T2_tilde[qualified_index] / ( (1-T1[qualified_index]) *  (1-T2[qualified_index]) )
 
