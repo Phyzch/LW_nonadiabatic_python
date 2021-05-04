@@ -4,14 +4,25 @@ import matplotlib
 import matplotlib.pyplot as plt
 from Generate_input_file import Generate_input_files
 from Analyze_IPR import Analyze_IPR_all_state,Read_IPR_all_state, Read_local_density_of_state , Search_state, Read_average_coupling_strength_and_local_density_of_state
+from Compute_transition_criteria_T import T_in_same_electronic_state, T_in_another_electronic_state
+import matplotlib.gridspec as gridspec
 
 
 def Analyze_multiple_simulation_result():
     matplotlib.rcParams.update({'font.size': 15})
     parent_file_path = "/home/phyzch/CLionProjects/4_point_correlation_calculation/result/spin_boson_LW_model/Batch_simulation_new/"
 
-    tunneling_strength = [0, 100 , 200 , 300 , 500, 1000 ]
-    scaling_factor = [ 0.1 , 0.12, 0.15 , 0.18, 0.2 , 0.25, 0.3]
+    frequency_list = [1149, 508, 291, 474, 843, 333]
+
+    V0 = 300
+
+    lambda_up = 2000
+    lambda_down = 2000
+    coupling_mode_freq = 1149
+    alpha = (lambda_up + lambda_down) / coupling_mode_freq
+
+    tunneling_strength = [0, 5, 10 ,20, 30, 50, 70, 100 , 200 , 300 ]
+    scaling_factor = [ 0.1, 0.18  ]
 
     scaling_num = len(scaling_factor)
     tunneling_coupling_num = len(tunneling_strength)
@@ -62,16 +73,10 @@ def Analyze_multiple_simulation_result():
         local_density_of_state_same_list.append(local_density_of_state_same)
         local_density_of_state_another_list.append(local_density_of_state_another)
 
-    Criteria_T_same_list = []
-    Criteria_T_another_list = []
-    for i in range(file_num):
-        Mode_number_list, rho_local_same, rho_local_another, V_average_same, V_average_another, \
-        Criteria_T_same, Criteria_T_another \
-        = Read_average_coupling_strength_and_local_density_of_state(path_list[i])
-
-        Criteria_T_same_list.append(Criteria_T_same)
-        Criteria_T_another_list.append(Criteria_T_another)
-
+    # for i in range(file_num):
+    #     Mode_number_list, rho_local_same, rho_local_another, V_average_same, V_average_another, \
+    #     Criteria_T_same, Criteria_T_another \
+    #     = Read_average_coupling_strength_and_local_density_of_state(path_list[i])
 
 
     Crossing_point_state = [1, 0, 2, 2, 1, 1, 1 ]
@@ -89,91 +94,118 @@ def Analyze_multiple_simulation_result():
             final_IPR_for_state.append(Final_IPR_list[i][position])
             complementary_final_IPR_for_state.append(Final_IPR_list[i][complementary_position])
 
-        # local density of state for specific state
-        local_density_of_state_same_for_state = []
-        local_density_of_state_another_for_state = []
+        # compute T:
+        T_same_electronic_state = np.zeros([2,scaling_num])
+        State_all = [Crossing_point_state, Crossing_point_complementary]
+        for i in range(2):
+            average_quanta = np.mean(State_all[i][1:])
+            for j in range (scaling_num):
+                scaling_factor_value = scaling_factor[j]
+                T = T_in_same_electronic_state(frequency_list, V0, 1/scaling_factor_value, average_quanta)
+                T_same_electronic_state[i][j] = T
 
-        complementary_local_density_of_state_same_for_state =[]
-        complementary_local_density_of_state_another_for_state = []
+        # compute T':
+        T_tunneling = np.zeros([2, tunneling_coupling_num])
+        # connectivity for coupling K
+        K  = 20
+        state_m = Crossing_point_complementary[1]
+        state_n = Crossing_point_state[1]
+        for i in range(2):
+            for j in range(tunneling_coupling_num):
+                T_prime = T_in_another_electronic_state(K,tunneling_strength[j],alpha, state_m, state_n, coupling_mode_freq )
+                T_tunneling[i][j] = T_prime
 
-        # T and T' for two state
-        T_state1 = []
-        T_state2 = []
+        fig = plt.figure(figsize=(10, 20))
+        spec = gridspec.GridSpec(nrows=1, ncols=2, figure=fig)
+        spec.update(hspace=0.5, wspace=0.3)
+        ax_1 = fig.add_subplot(spec[0,0])
+        ax_2 = fig.add_subplot(spec[0,1])
 
-        T_prime_state1 = []
-        T_prime_state2 = []
-
-        for i in range(file_num):
-            local_density_of_state_same_for_state.append(local_density_of_state_same_list[i][position])
-            local_density_of_state_another_for_state.append(local_density_of_state_another_list[i][position])
-
-            complementary_local_density_of_state_same_for_state.append(local_density_of_state_same_list[i][complementary_position])
-            complementary_local_density_of_state_another_for_state.append(local_density_of_state_another_list[i][complementary_position])
-
-            T_state1.append(Criteria_T_same_list[i][position])
-            T_state2.append(Criteria_T_same_list[i][complementary_position])
-
-            T_prime_state1.append(Criteria_T_another_list[i][position])
-            T_prime_state2.append(Criteria_T_another_list[i][complementary_position])
-
-        print(complementary_local_density_of_state_same_for_state)
-        print(complementary_local_density_of_state_another_for_state)
-
-        fig , ax = plt.subplots(nrows=1, ncols=1)
         color_list = ['blue' , 'orange' ,'green' , 'red', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan']
         for i in range(tunneling_coupling_num):
             # with same tunneling, we should have same local_density_of_state_another in this case
-            local_density_of_state_same_for_state_slice = local_density_of_state_same_for_state[i * scaling_num : (i+1) * scaling_num]
-            common_local_density_of_state_another_for_state = round(
-                local_density_of_state_another_for_state[i * scaling_num], 3)
+
             final_IPR_for_state_slice = final_IPR_for_state[i*scaling_num : (i+1) * scaling_num ]
-            ax.plot( local_density_of_state_same_for_state_slice, final_IPR_for_state_slice, 'o', markersize = 10,
+            ax_1.plot( scaling_factor, final_IPR_for_state_slice, 'o', markersize = 10,
                      color=color_list[i],
-                     label ='spin up  state: ' +str(Crossing_point_state[1:] ) + '  $N_{tunneling} = $' + str(common_local_density_of_state_another_for_state) )
+                     label ='spin up  state: ' +str(Crossing_point_state[1:] ) + '  $T_{tunneling} = $' + str(round(T_tunneling[0][i] , 4 )) )
 
-            complementary_local_density_of_state_same_slice = \
-                complementary_local_density_of_state_same_for_state[i * scaling_num : (i+1) * scaling_num]
-            complementary_common_local_density_of_state_another_for_state = round(
-                complementary_local_density_of_state_another_for_state[i * scaling_num], 3)
-
-            complementary_final_IPR_for_state_slice = \
-                complementary_final_IPR_for_state[i*scaling_num : (i+1) * scaling_num ]
-
-            print(complementary_final_IPR_for_state_slice)
+            complementary_final_IPR_for_state_slice = complementary_final_IPR_for_state[ i * scaling_num : (i+1) * scaling_num ]
 
             # for clarity. we plot this against local density of state for same state.
-            ax.plot(local_density_of_state_same_for_state_slice, complementary_final_IPR_for_state_slice, '*',  markersize = 10,
+            ax_1.plot( scaling_factor, complementary_final_IPR_for_state_slice, '*',  markersize = 10,
                     color = color_list[i],
-                    label = 'spin down  state:' + str(Crossing_point_complementary[1:]) + '  $N_{tunneling} = $' + str(common_local_density_of_state_another_for_state))
+                    label = 'spin down  state:' + str(Crossing_point_complementary[1:]) + '  $T_{tunneling} = $' + str( round(T_tunneling[0][i] , 4 )) )
 
-        ax.legend(loc = 'best')
-        ax.set_xlabel('$N_{anharmonicity}$   (spin up) ')
-        ax.set_ylabel('IPR')
-        ax.set_title('spin up state : ' +str(Crossing_point_state[1:]) + " \n spin down state:  "+ str(Crossing_point_complementary[1:]) )
+
+        ax_1.legend(loc = 'best', prop={'size': 8})
+        ax_1.set_xlabel(' scaling factor ')
+        ax_1.set_ylabel('IPR')
+        ax_1.set_title('spin up state : ' +str(Crossing_point_state[1:]) + " \n spin down state:  "+ str(Crossing_point_complementary[1:]) )
+
+        ax_2.plot(scaling_factor, T_same_electronic_state[0], color = color_list[0], marker = 'o', label = 'spin up state:  '+str(Crossing_point_state[1:] ))
+        ax_2.plot(scaling_factor, T_same_electronic_state[1], color = color_list[1], marker = 'o', label = 'spin down state:  ' + str(Crossing_point_complementary[1:]) )
+        ax_2.legend(loc = 'best')
+        ax_2.set_xlabel(' scaling factor ')
+        ax_2.set_ylabel('T in same spin state')
+        ax_2.set_title('spin up state : ' +str(Crossing_point_state[1:]) + " \n spin down state:  "+ str(Crossing_point_complementary[1:]))
 
 
         fig1, ax1 = plt.subplots(nrows=1,ncols=1)
+        C_fitting = 5.5
         for i in range(tunneling_coupling_num):
             final_IPR_for_state_slice = final_IPR_for_state[i * scaling_num: (i + 1) * scaling_num]
+            final_IPR_for_complementary_state_slice = complementary_final_IPR_for_state[i * scaling_num: (i + 1) * scaling_num]
             # T1
-            T1 = np.array(T_state1[i * scaling_num: (i + 1) * scaling_num])
+            T1 = T_same_electronic_state[0]
             # T1'
-            T1_tilde =  np.array(T_prime_state1[i * scaling_num : (i + 1) * scaling_num ])
+            T1_tilde =  T_tunneling[0][i]
 
             # T2
-            T2 = np.array (T_state2[i * scaling_num: (i + 1) * scaling_num] )
+            T2 = T_same_electronic_state[1]
 
             # T2'
-            T2_tilde = np.array( T_prime_state2[i * scaling_num : (i + 1) * scaling_num ] )
+            T2_tilde = T_tunneling[1][i]
 
-            qualified_index = [ i for i in range(scaling_num) if T2[i] < 0.95 and T1[i] < 0.95 ]
 
-            Criteria = T1_tilde[qualified_index] * T2_tilde[qualified_index] / ( (1-T1[qualified_index]) *  (1-T2[qualified_index]) )
+            qualified_index = [ i for i in range(scaling_num) if T1[i] < C_fitting and T2[i] < C_fitting ]
 
-            ax1.plot(Criteria, np.array(final_IPR_for_state_slice)[qualified_index] , 'o' , color = color_list[i] , label = 'spin up state  $ N_{tunneling} = $  ' + str(T1_tilde[0]))
+            if(T1_tilde == 0 or T2_tilde == 0):
+                T1_tilde = pow(10,-4)
+                T2_tilde = pow(10,-4)
+
+            Criteria = T1_tilde * T2_tilde / ( (C_fitting-T1[qualified_index]) *  (C_fitting-T2[qualified_index]) )
+            Criteria = T1_tilde * T2_tilde * np.ones([len(qualified_index)])
+            # plot different T' with different color
+            # ax1.plot(Criteria, np.array(final_IPR_for_state_slice)[qualified_index] , 'o' , color = color_list[i] , label = '$T_{t,up}$ = ' + str( round(T1_tilde, 3))
+            #          + "  $T_{t,down}$ =  " + str( round(T2_tilde,3)  ) )
+            #
+            # ax1.plot(Criteria, np.array(final_IPR_for_complementary_state_slice)[qualified_index], '*', markersize = 10, color=color_list[i])
+
+
+            # plot different scaling with different color
+            Criteria_len = len(Criteria)
+            final_IPR_for_state_slice_qualified = np.array(final_IPR_for_state_slice)[qualified_index]
+            final_IPR_for_complementary_state_qualified = np.array(final_IPR_for_complementary_state_slice)[qualified_index]
+            if(i == 0):
+                for j in range(Criteria_len):
+                    ax1.plot(Criteria[j], final_IPR_for_state_slice_qualified[j], 'o', color=color_list[j] , label = '$T_{up}$ = ' + str( round (T_same_electronic_state[0][qualified_index[j]] , 3 ) )
+                              + ' $T_{down}$ = ' + str(  round (T_same_electronic_state[1][qualified_index[j]] , 3  )  ) )
+
+                    ax1.plot(Criteria[j], final_IPR_for_complementary_state_qualified[j], '*',
+                             markersize=10, color=color_list[j])
+            else:
+                for j in range(Criteria_len):
+                    ax1.plot(Criteria[j], final_IPR_for_state_slice_qualified[j], 'o', color=color_list[j])
+
+                    ax1.plot(Criteria[j], final_IPR_for_complementary_state_qualified[j], '*',
+                             markersize=10, color=color_list[j])
 
         ax1.set_ylabel('IPR')
-        ax1.set_xlabel("$ T'_{1} T'_{2} /[(1- T_{1}) * (1-T_{2})] $")
+        # ax1.set_xlabel("$ T'_{1} T'_{2} /[(C- T_{1}) * (C-T_{2})] $   C = " + str(C_fitting))
+        ax1.set_xlabel("$ T'_{1} T'_{2}  $")
+        ax1.set_xscale('log')
+        # ax1.set_yscale('log')
         ax1.legend(loc = 'best')
 
         plt.show()

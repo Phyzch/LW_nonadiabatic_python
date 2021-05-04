@@ -16,7 +16,7 @@ def main():
 
     Analyze_multiple_simulation_result()
 
-    # input_folder_path ="/home/phyzch/CLionProjects/4_point_correlation_calculation/result/spin_boson_LW_model/Bathc_simulation_new/"
+    # input_folder_path ="/home/phyzch/CLionProjects/4_point_correlation_calculation/result/spin_boson_LW_model/Batch_simulation/"
     # Generate_input_files(input_folder_path)
 
 def plot_simulation_result():
