@@ -42,6 +42,15 @@ def T_in_another_electronic_state(K, tunneling_strength, alpha, m, n, vibrationa
 
     return T
 
+def T_in_another_electronic_state_Duschrinsky_rotation ( K, tunneling_strength, typical_state_overlap, frequency_list):
+    D = 1 / ( np.linalg.norm(frequency_list[:2]) * np.pi )
+
+    coupling_strength = typical_state_overlap * tunneling_strength
+
+    T_prime = 2 * np.pi * pow(K * coupling_strength * D,2)
+
+    return T_prime
+
 def Analyze_T_scaling():
     frequency_list = [1149, 508, 291, 474, 843, 333]
 

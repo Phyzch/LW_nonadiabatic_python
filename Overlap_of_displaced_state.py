@@ -15,10 +15,13 @@ def Overlap_n_m(alpha,m, n):
 
     return X
 
+
 # lambda_up = 2000
 # lambda_down = 2000
 # frequency = 1149
 # alpha = (lambda_up + lambda_down) / frequency
+# overlap = Overlap_n_m(alpha, 3 ,3)
+# print(overlap)
 # m = 9
 # X_list = []
 # n_list = range(0,15)

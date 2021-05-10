@@ -4,11 +4,14 @@ import re
 from shutil import copy
 
 def Generate_input_files(folder_path):
+
+    Mode_number = 1
+
     sampling_state_index_file_path = os.path.join(folder_path, "sampling_state_info.txt")
     input_file_path = os.path.join(folder_path, "input.txt")
 
-    tunneling_strength = [0, 5, 10 ,20, 30, 50, 70, 100 , 200 , 300 ]
-    scaling_factor = [ 0.16, 0.17 ]
+    tunneling_strength = [0,  10 ,20, 30, 50, 70, 100 , 200 , 300 , 500]
+    scaling_factor = [ 0.1, 0.12, 0.15, 0.16,  0.17 , 0.18, 0.19 ,0.2, 0.25]
 
     tunneling_num = len(tunneling_strength)
     scaling_num = len(scaling_factor)
@@ -32,7 +35,7 @@ def Generate_input_files(folder_path):
                 copy(sampling_state_index_file_path, sampling_state_index_subfolder_file_path)
 
                 # change input file content
-                Change_input_file(input_subfolder_path_copy, input_subfolder_path, tunneling_strength[i], scaling_factor[j])
+                Change_input_file(input_subfolder_path_copy, input_subfolder_path, tunneling_strength[i], scaling_factor[j], Mode_number)
 
                 os.remove(input_subfolder_path_copy)
 
@@ -40,7 +43,7 @@ def Generate_input_files(folder_path):
     else:
         raise NameError("sampling_state_info.txt or input.txt does not exist.")
 
-def Change_input_file(input_path, output_path, tunneling_strength, scaling_factor):
+def Change_input_file(input_path, output_path, tunneling_strength, scaling_factor , Mode_number):
     fin = open(input_path, "rt")
     fout = open(output_path, "wt")
 
@@ -55,7 +58,14 @@ def Change_input_file(input_path, output_path, tunneling_strength, scaling_facto
 
     # replace scaling factor and tunneling_strength to value we want
     line[7] = scaling_factor
-    line[12] = tunneling_strength
+
+    # for 1 mode case.
+    if Mode_number == 1:
+        line[12] = tunneling_strength
+
+    if Mode_number == 2:
+        line[14] = tunneling_strength
+
     # Rmax should be int
     line[5] = int(line[5])
     for i in range(len(line)):

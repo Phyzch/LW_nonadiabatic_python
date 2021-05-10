@@ -173,7 +173,6 @@ def Analyze_IPR_all_state(file_path):
     ax.set_xlabel('energy')
     ax.set_ylabel('IPR')
     ax.set_title('IPR for all states')
-    ax.set_ylim(0.8, 60)
     ax.legend(loc = 'best')
 
     # Plot how IPR change with time to see if IPR saturate or not
