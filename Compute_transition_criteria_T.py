@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 # This program is based on Leitner_Wolynes_1996: https://doi.org/10.1063/1.472920   eq. (4.6) to estimate T in molecules
 from Overlap_of_displaced_state import Overlap_n_m
-def T_in_same_electronic_state(frequency, V0, inverse_scaling_factor, average_quanta):
+def T_in_same_electronic_state(frequency, V3, inverse_scaling_factor, average_quanta):
     # N = dof
     N = len(frequency)
 
@@ -11,26 +11,30 @@ def T_in_same_electronic_state(frequency, V0, inverse_scaling_factor, average_qu
     inverse_scaling_factor = inverse_scaling_factor / np.sqrt( max(average_quanta,1) )
 
 
-    V3 = V0 * pow(1 / inverse_scaling_factor , 3)
-
     Phi_tilde = V3 * 1/ (np.pi * frequency_rms )
 
     kappa = 2 * N / inverse_scaling_factor
 
     F = 0
-    for Q in range(3,5):
+    for Q in range(3,4):
         F = F + pow (kappa / Q , Q) * np.exp(Q) /Q * np.power(2 * np.pi , -0.5)
 
     T = 2 * np.pi / 3 * pow(Phi_tilde,2) * pow(inverse_scaling_factor,6) * pow(F,2)
 
     return T
 
-# frequency_list = [1149,508,291,474,843, 333]
-# quanta = [9, 2, 2, 1, 1, 1]
-# average_quanta = np.mean(quanta)
-# V0 = 300
-# scaling_factor = 0.15
-# T = T_in_same_electronic_state(frequency_list, V0, 1 / scaling_factor, average_quanta)
+def compute_transition_criteria_T ():
+    # frequency_list = [2210, 2222 , 2966 , 2945 , 2130, 2126 , 2880 , 2880 ]
+    frequency_list = [3070, 2955, 2857, 1617, 1473, 1448, 1302, 1109, 962, 933, 896, 2926, 1130, 1099, 803, 609, 387, 3062, 2914, 1445, 1349, 1275, 1203, 1043, 905, 695, 2933, 2857, 1025, 876, 775, 603, 127]
+    quanta = [1 ,0 ,0 ,0 ,0 ,1 ,0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1]
+    average_quanta = np.mean(quanta)
+    scaling_factor = 0.14
+
+    V3 = 9
+    T = T_in_same_electronic_state(frequency_list, V3, 1 / scaling_factor, average_quanta)
+    print("T =  " + str(T))
+
+# compute_transition_criteria_T()
 
 def T_in_another_electronic_state(K, tunneling_strength, alpha, m, n, vibrational_frequency):
     # m is index for spin down. n is index for spin up

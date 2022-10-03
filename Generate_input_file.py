@@ -11,7 +11,7 @@ def Generate_input_files(folder_path):
     input_file_path = os.path.join(folder_path, "input.txt")
 
     tunneling_strength = [0,  10 ,20, 30, 50, 70, 100 , 200 , 300 , 500]
-    scaling_factor = [ 0.1, 0.12, 0.15, 0.16,  0.17 , 0.18, 0.19 ,0.2, 0.25]
+    scaling_factor = [ 0.1, 0.12, 0.15, 0.16,  0.17 , 0.18, 0.19 ,0.2]
 
     tunneling_num = len(tunneling_strength)
     scaling_num = len(scaling_factor)

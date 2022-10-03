@@ -10,7 +10,7 @@ import matplotlib.gridspec as gridspec
 
 def Analyze_multiple_simulation_result():
     matplotlib.rcParams.update({'font.size': 15})
-    parent_file_path = "/home/phyzch/CLionProjects/4_point_correlation_calculation/result/spin_boson_LW_model/2_coordinate/Tunneling/Batch_simulation/"
+    parent_file_path = "/home/phyzch/CLionProjects/4_point_correlation_calculation/result/spin_boson_LW_model/Duschrinsky_rotation/Batch_simulation_30_long_time/"
 
     frequency_list = [1149, 508, 291, 474, 843, 333]
 
@@ -21,7 +21,7 @@ def Analyze_multiple_simulation_result():
     coupling_mode_freq = 1149
     alpha = (lambda_up + lambda_down) / coupling_mode_freq
 
-    tunneling_strength = [ 0 , 10 , 20, 30, 50, 70 , 100, 200, 300 , 500 ]
+    tunneling_strength = [ 0 , 10 , 20, 30, 50, 70 , 100, 200, 300  ]
     scaling_factor = [ 0.1,  0.15, 0.16, 0.17, 0.18, 0.19, 0.2 ]
 
     scaling_num = len(scaling_factor)
@@ -60,7 +60,7 @@ def Analyze_multiple_simulation_result():
     for i in range(file_num):
         state_num, nmode, state_energy, Mode_number_list, IPR_list, Time_list = Read_IPR_all_state(path_list[i])
         Len = len(IPR_list)
-        Final_IPR = np.mean(IPR_list[int(Len  / 2) : ] , 0)
+        Final_IPR = np.mean(IPR_list[int(Len  / 5) : ] , 0)
         shared_Mode_number_list = Mode_number_list
         shared_state_energy = state_energy
         Final_IPR_list.append(Final_IPR)

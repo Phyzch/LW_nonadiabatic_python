@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib
 import re
 import os
+import matplotlib.gridspec as gridspec
 
 def Read_IPR_all_state(file_path):
     file_name = os.path.join(file_path,"IPR_all_state.txt")
@@ -35,9 +36,9 @@ def Read_IPR_all_state(file_path):
             Mode_number_list.append(mode_number)
             line_index = line_index + 1
 
-        Step_num = int ((datalen - line_index)/2 )
+        step_num = int ((datalen - line_index)/2 )
 
-        for i in range(Step_num):
+        for i in range(step_num):
             line = data[line_index]
             line = re.split(' ', line)
 
@@ -152,39 +153,71 @@ def Search_state(mode_state_list, mode_state):
     return -1
 
 def Analyze_IPR_all_state(file_path):
+    save_bool = False
     matplotlib.rcParams.update({'font.size': 15})
-    state_num, nmode , state_energy, Mode_number_list, IPR_list , Time_list = Read_IPR_all_state(file_path)
+    state_num, nmode , state_energy, mode_number_list, IPR_list , time_list = Read_IPR_all_state(file_path)
 
-    Ground_state_index = [ i for i in range(state_num) if Mode_number_list[i][0] == 0 ]
-    Excited_state_index = [i for i in range(state_num) if Mode_number_list[i][0] == 1 ]
+    Ground_state_index = [ i for i in range(state_num) if mode_number_list[i][0] == 0 ]
+    Excited_state_index = [i for i in range(state_num) if mode_number_list[i][0] == 1 ]
 
     State_energy_for_ground_state = state_energy[Ground_state_index]
     State_energy_for_excited_state = state_energy[Excited_state_index]
 
-    Final_IPR = IPR_list[-1]
+    # take IPR at final time as final IPR
+    time_len = len(time_list)
+    start_time_to_plot_index = int(time_len * 2 / 3)
+
+    Final_IPR = np.mean(IPR_list[ start_time_to_plot_index: ] , 0)
     Final_IPR_for_ground_state = Final_IPR[Ground_state_index]
     Final_IPR_for_excited_state = Final_IPR[Excited_state_index]
-    print('final time:   ' + str(Time_list[-1]) )
+    print('final time:   ' + str(time_list[-1]) )
 
-    fig,ax = plt.subplots(nrows=1, ncols=1)
-    ax.scatter( State_energy_for_ground_state , Final_IPR_for_ground_state, label = 'ground state' )
-    ax.scatter( State_energy_for_excited_state, Final_IPR_for_excited_state, label = 'excited state')
+    fig = plt.figure(figsize=(10, 10))
+    spec = gridspec.GridSpec(nrows=1, ncols=1, figure=fig)
+    ax = fig.add_subplot(spec[0,0])
+
+    # ax.scatter( State_energy_for_ground_state , Final_IPR_for_ground_state, label = 'electronic state |0>'  )
+    # ax.scatter( State_energy_for_excited_state, Final_IPR_for_excited_state, label = 'electronic state |1>' )
+
+    ax.scatter(state_energy, Final_IPR)
 
     ax.set_xlabel('energy')
     ax.set_ylabel('IPR')
     ax.set_title('IPR for all states')
-    ax.legend(loc = 'best')
+    # ax.legend(loc = 'best')
 
     # Plot how IPR change with time to see if IPR saturate or not
-    fig1, ax1 = plt.subplots(nrows=1, ncols=1)
+    fig1 = plt.figure(figsize = (10,10))
+    spec1 = gridspec.GridSpec(nrows = 1, ncols = 1, figure = fig1)
+    ax1 = fig1.add_subplot(spec1[0,0])
 
     state_energy_index = np.argsort(-state_energy )
     max_state_energy = state_energy[state_energy_index[0]]
     IPR_list_trans = np.transpose(IPR_list)
 
-    ax1.plot(Time_list , IPR_list_trans[state_energy_index[0]] )
+    for i in range(5):
+        index = i + 25
+        if mode_number_list[state_energy_index[index]][0] == 0:
+            label = '$|n_{e}> = $|0>'
+        else:
+            label = '$|n_{e}> = $|1>'
+        label = label + " $|n_{v}>$ = " + str(mode_number_list[state_energy_index[index]][1:])
+        label = label + " E = " + str(round( state_energy[state_energy_index[index]], 2))
+        ax1.plot(time_list , IPR_list_trans[state_energy_index[index]] , label = label , linewidth = 2)
+    ax1.legend(loc = 'best')
+
     ax1.set_xlabel('Time')
     ax1.set_ylabel('IPR')
     ax1.set_title('IPR for single state')
+    ax1.set_ylim([0,60])
 
     plt.show()
+
+    if save_bool:
+        fig_name = "energy vs IPR.png"
+        fig_path = os.path.join(file_path , fig_name)
+        fig.savefig(fig_path)
+
+        fig1_name = "IPR vs time.png"
+        fig1_path = os.path.join(file_path, fig1_name)
+        fig1.savefig(fig1_path)
