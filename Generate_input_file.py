@@ -1,7 +1,4 @@
-import numpy as np
-import os
-import re
-from shutil import copy
+from util import *
 
 def Generate_input_files(folder_path):
 

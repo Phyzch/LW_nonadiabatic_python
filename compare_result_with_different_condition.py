@@ -1,10 +1,7 @@
-import numpy as np
-import os
-import matplotlib.pyplot as plt
+from util import *
 from Analyze_IPR import Analyze_IPR_all_state,Read_IPR_all_state, Read_local_density_of_state , Search_state, Read_average_coupling_strength_and_local_density_of_state
 from Compute_transition_criteria_T import T_in_same_electronic_state, T_in_another_electronic_state, T_in_another_electronic_state_Duschrinsky_rotation
-import matplotlib.gridspec as gridspec
-import matplotlib
+
 
 def Analyze_IPR_different_condition():
     matplotlib.rcParams.update({'font.size': 12})

@@ -1,9 +1,5 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib
-import re
-import os
-import matplotlib.gridspec as gridspec
+from util import *
+
 
 def Read_IPR_all_state(file_path):
     file_name = os.path.join(file_path,"IPR_all_state.txt")
@@ -152,8 +148,7 @@ def Search_state(mode_state_list, mode_state):
 
     return -1
 
-def Analyze_IPR_all_state(file_path):
-    save_bool = False
+def Analyze_IPR_all_state(file_path , save_bool):
     matplotlib.rcParams.update({'font.size': 15})
     state_num, nmode , state_energy, mode_number_list, IPR_list , time_list = Read_IPR_all_state(file_path)
 
@@ -184,6 +179,7 @@ def Analyze_IPR_all_state(file_path):
     ax.set_xlabel('energy')
     ax.set_ylabel('IPR')
     ax.set_title('IPR for all states')
+    ax.set_ylim([0,25])
     # ax.legend(loc = 'best')
 
     # Plot how IPR change with time to see if IPR saturate or not
@@ -195,8 +191,8 @@ def Analyze_IPR_all_state(file_path):
     max_state_energy = state_energy[state_energy_index[0]]
     IPR_list_trans = np.transpose(IPR_list)
 
-    for i in range(5):
-        index = i + 25
+    for i in range(10):
+        index = i
         if mode_number_list[state_energy_index[index]][0] == 0:
             label = '$|n_{e}> = $|0>'
         else:
@@ -209,9 +205,8 @@ def Analyze_IPR_all_state(file_path):
     ax1.set_xlabel('Time')
     ax1.set_ylabel('IPR')
     ax1.set_title('IPR for single state')
-    ax1.set_ylim([0,60])
+    # ax1.set_ylim([0,60])
 
-    plt.show()
 
     if save_bool:
         fig_name = "energy vs IPR.png"
@@ -221,3 +216,28 @@ def Analyze_IPR_all_state(file_path):
         fig1_name = "IPR vs time.png"
         fig1_path = os.path.join(file_path, fig1_name)
         fig1.savefig(fig1_path)
+
+def compare_IPR_subroutine(file_path_list, label_list, mode_index,  fig_file_path, save_bool):
+    file_num = len(file_path_list)
+    fig = plt.figure(figsize=(10, 10))
+    spec = gridspec.GridSpec(nrows=1, ncols=1, figure=fig)
+    ax = fig.add_subplot(spec[0,0])
+
+    mode_number_list = []
+
+    for i in range(file_num):
+        file_path = file_path_list[i]
+        label = label_list[i]
+        state_num, nmode, state_energy, mode_number_list, IPR_list, time_list = Read_IPR_all_state(
+            file_path)
+
+        ax.plot(time_list, np.transpose(IPR_list)[mode_index] , label = label , linewidth = 3)
+
+    ax.legend(loc = 'best')
+    ax.set_title('IPR mode: ' + str(mode_number_list[mode_index]))
+    ax.set_yscale('log')
+
+    if save_bool:
+        fig_name = "IPR diff file.png"
+        fig_path = os.path.join(fig_file_path, fig_name)
+        fig.savefig(fig_path)

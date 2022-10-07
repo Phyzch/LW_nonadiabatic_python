@@ -1,7 +1,4 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-from scipy import special
+from util import *
 
 def Overlap_n_m(alpha,m, n):
     # m in quanta in spin down. n ins quanta in spin up
@@ -106,9 +103,9 @@ def plot_Franck_condon_factor():
     compute franck condon factor for <m| alpha;n>
     :return:
     '''
-    alpha = 0.5
+    alpha = 1
 
-    qn_cutoff = 15
+    qn_cutoff = 20
 
     franck_condon_table = np.zeros([qn_cutoff , qn_cutoff])
     franck_condon_table_approx = np.zeros([qn_cutoff, qn_cutoff ])
@@ -129,7 +126,7 @@ def plot_Franck_condon_factor():
     fig.colorbar(cp)
 
     col_index_list = np.array(range(qn_cutoff))
-    row_index_to_plot = 5
+    row_index_to_plot = 2
 
 
     fig1 = plt.figure(figsize=(10, 10))
@@ -171,3 +168,103 @@ def plot_Bessel_function_envolope():
     ax.legend(loc = 'best')
     plt.show()
 
+def compute_LW_factor_subroutine(frequency_list, alpha_list, quantum_state, nonadiabatic_coupling, ground_state_energy_diff):
+    '''
+    Estimate Logan Wolynes factor
+    :param frequency_list:
+    :param alpha_list:
+    :param quantum_state:
+    :return:
+    '''
+    qn_cutoff = 12
+    franck_condon_factor_list = np.zeros([qn_cutoff + 1])
+    dof = len(quantum_state)
+    max_franck_condon_list = np.zeros([dof])
+    for i in range(dof):
+        qn = quantum_state[i]
+        alpha = alpha_list[i]
+        for j in range(qn_cutoff + 1):
+            # <m | alpha;n>
+            franck_condon_factor = Overlap_n_m(alpha, qn, j)
+            franck_condon_factor_list[j] = franck_condon_factor
+
+        # maximum overlap for <m|alpha;n>
+        max_franck_condon = np.max(np.abs(franck_condon_factor_list))
+        max_franck_condon_list[i] = max_franck_condon
+
+    width_list = 1/ np.power(max_franck_condon_list, 2)
+
+    # connectivity
+    K = np.prod(width_list)
+    # nonadiabatic coupling between states
+    Vt = nonadiabatic_coupling * np.prod(max_franck_condon_list)
+    # local density of states
+    D = 1 / (ground_state_energy_diff)
+
+    LW_factor = K * Vt * D * np.sqrt( 2 * np.pi / 3)
+
+    return LW_factor
+
+def compute_LW_factor_PBI():
+    '''
+
+    :return:
+    '''
+    # PBI1 parameter
+    frequency_list = np.array([ 1628, 1570, 1469, 1371 ])
+    alpha_list = np.array([ 0.197, 0.29, 0.205, 0.45 ])
+    nonadiabatic_coupling = 514
+
+    quantum_state = np.array([0,1,1,2])
+
+    ground_state_energy_diff = 600
+
+    LW_factor = compute_LW_factor_subroutine(frequency_list, alpha_list,  quantum_state, nonadiabatic_coupling, ground_state_energy_diff)
+
+    print("LW factor PBI1:" + str(LW_factor))
+
+def compute_LW_factor_BChl():
+    '''
+
+    :return:
+    '''
+    # BChl parameter
+    frequency_list = np.array([890, 727, 345, 1117, 1158])
+    alpha_list = np.array( [0.169, 0.163, 0.127, 0.101, 0.101] )
+    nonadiabatic_coupling = 100
+
+    quantum_state = np.array([0 ,1 ,3 ,0 ,3])
+    # quantum_state = np.array([0,0,4,0,0])
+    ground_state_energy_diff = 600
+
+    LW_factor = compute_LW_factor_subroutine(frequency_list, alpha_list, quantum_state, nonadiabatic_coupling, ground_state_energy_diff)
+
+    print("state " + str(quantum_state))
+    print("LW factor BChl:" + str(LW_factor))
+
+def compute_LW_factor():
+    '''
+
+    :return:
+    '''
+    # LW factor for PBI system
+    # compute_LW_factor_PBI()
+
+    # LW factor for BChl
+    compute_LW_factor_BChl()
+
+
+def analyze_coupling_strength():
+    state1 = np.array([0, 4,  2, 0 ,1])
+    state2 = np.array([0, 3, 2, 0, 2])
+
+    coupling = 363
+    alpha = np.array([0.169, 0.163, 0.127, 0.101, 0.101])
+
+    franck_condon_factor = 1
+    for i in range(len(state1)):
+        franck_condon_factor = franck_condon_factor * Overlap_n_m(alpha[i], state1[i] , state2[i])
+
+    coupling_strength = coupling * franck_condon_factor
+
+    print(coupling_strength)

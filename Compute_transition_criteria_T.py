@@ -1,5 +1,4 @@
-import numpy as np
-import matplotlib.pyplot as plt
+from util import *
 # This program is based on Leitner_Wolynes_1996: https://doi.org/10.1063/1.472920   eq. (4.6) to estimate T in molecules
 from Overlap_of_displaced_state import Overlap_n_m
 def T_in_same_electronic_state(frequency, V3, inverse_scaling_factor, average_quanta):
