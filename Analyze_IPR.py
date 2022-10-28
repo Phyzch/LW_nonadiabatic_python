@@ -179,7 +179,7 @@ def Analyze_IPR_all_state(file_path , save_bool):
     ax.set_xlabel('energy')
     ax.set_ylabel('IPR')
     ax.set_title('IPR for all states')
-    ax.set_ylim([0,25])
+    # ax.set_ylim([0,25])
     # ax.legend(loc = 'best')
 
     # Plot how IPR change with time to see if IPR saturate or not
@@ -191,7 +191,7 @@ def Analyze_IPR_all_state(file_path , save_bool):
     max_state_energy = state_energy[state_energy_index[0]]
     IPR_list_trans = np.transpose(IPR_list)
 
-    for i in range(10):
+    for i in range(1):
         index = i
         if mode_number_list[state_energy_index[index]][0] == 0:
             label = '$|n_{e}> = $|0>'

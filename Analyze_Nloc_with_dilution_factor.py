@@ -6,7 +6,7 @@ from Analyze_survival_prob import compute_dilution_factor
 from util import *
 
 
-def plot_dilution_factor_and_Nloc_single_state_change_Vt(same_PES_Nloc, diff_PES_Nloc, mode_num, dilution_factor, ax):
+def plot_dilution_factor_and_Nloc_single_state_change_Vt(same_PES_Nloc, diff_PES_Nloc, mode_num, dilution_factor, ax, color):
     '''
     plot result for single state with different nonadiabatic coupling.
     :param same_PES_Nloc:
@@ -24,8 +24,8 @@ def plot_dilution_factor_and_Nloc_single_state_change_Vt(same_PES_Nloc, diff_PES
     # T~/ (1-T)
     criteria = diff_PES_Nloc / (1-same_PES_Nloc)
 
-    # ax.scatter(criteria, dilution_factor , label = str(mode_num[1:]))
-    ax.plot(criteria, dilution_factor , label = str(mode_num[1:]) , marker = 'o')
+    # ax.scatter(criteria, dilution_factor , label = str(mode_num[1:]) , color = color ,  s = 40 )
+    ax.plot(criteria, dilution_factor , label = str(mode_num[1:]) , marker = 'o', markersize = 8)
 
 def plot_dilution_factor_and_Nloc_change_Vt(mode_number_list, dilution_factor_list, same_PES_Nloc_list, diff_PES_Nloc_list, save_bool , fig_path):
     '''
@@ -43,28 +43,29 @@ def plot_dilution_factor_and_Nloc_change_Vt(mode_number_list, dilution_factor_li
     spec.update(hspace=0.5, wspace=0.3)
     ax = fig.add_subplot(spec[0, 0])
 
-    for i in range(0,5):
+    scatter_color = 'tab:blue'
+    for i in range(5, 10):
         same_PES_Nloc = same_PES_Nloc_list[i]
         diff_PES_Nloc = diff_PES_Nloc_list[i]
         mode_number = mode_number_list[i]
         dilution_factor = dilution_factor_list[i]
-        plot_dilution_factor_and_Nloc_single_state_change_Vt(same_PES_Nloc, diff_PES_Nloc, mode_number, dilution_factor, ax)
+        plot_dilution_factor_and_Nloc_single_state_change_Vt(same_PES_Nloc, diff_PES_Nloc, mode_number, dilution_factor, ax , scatter_color)
 
     ax.set_xlabel("$N'_{loc}$/(1-$N_{loc}$)")
     ax.set_ylabel('dilution factor')
     ax.set_yscale('log')
     ax.set_xscale('log')
-    ax.set_xlim([pow(10,-3),10])
+    ax.set_xlim([pow(10,-2),10])
     ax.set_ylim([5 * pow(10,-3) , 1])
 
     ax.legend(loc = 'best' , prop = {'size': 10})
 
     if save_bool:
-        fig_name = "LW criteria vs dilution factor.png"
+        fig_name = "LW criteria vs dilution factor.svg"
         fig_path1 = os.path.join(fig_path,fig_name)
         fig.savefig(fig_path1)
 
-def plot_same_PES_Nloc_vs_dilution_factor(same_PES_Nloc, dilution_factor_list):
+def plot_same_PES_Nloc_vs_dilution_factor(same_PES_Nloc, dilution_factor_list, file_path, save_bool):
     '''
 
     :return:
@@ -77,10 +78,16 @@ def plot_same_PES_Nloc_vs_dilution_factor(same_PES_Nloc, dilution_factor_list):
     same_PES_Nloc_no_Vt = same_PES_Nloc[:,0]
     dilution_factor = dilution_factor_list[:,0]
 
-    ax.scatter(same_PES_Nloc_no_Vt, dilution_factor)
+    ax.scatter(same_PES_Nloc_no_Vt, dilution_factor , s= 60)
     ax.set_xlabel('$N_{loc}$')
     ax.set_ylabel('dilution factor')
     ax.set_title('localized state dilution factor')
+
+    if save_bool:
+        fig_name = "dilution_factor_Vt=0.svg"
+        fig_path = os.path.join(file_path, fig_name)
+
+        fig.savefig(fig_path)
 
 
 def analyze_dilution_factor_and_Nloc():
@@ -91,16 +98,16 @@ def analyze_dilution_factor_and_Nloc():
     save_bool = False
     folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/Bchl 5mode/batch_simulation_dE=600/"
 
-    file_path1 = "Vt=0,V0=300,a=0.3"
-    file_path2 = "Vt=10,V0=300,a=0.3"
-    file_path3 = "Vt=50,V0=300,a=0.3"
-    file_path4 = "Vt=100,V0=300,a=0.3"
-    file_path5 = "Vt=200,V0=300,a=0.3"
-    file_path6 = "Vt=300,V0=300,a=0.3"
-    file_path7 = "Vt=500,V0=300,a=0.3"
-    file_path8 = "Vt=1000,V0=300,a=0.3"
+    # folder_path = '/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/Bchl 5mode/study_ground_energy_shift_Vt=300/'
+    file_path1 = 'Vt=0,V0=300,a=0.3'
+    file_path2 = 'Vt=50,V0=300,a=0.3'
+    file_path3 = 'Vt=100,V0=300,a=0.3'
+    file_path4 = 'Vt=200,V0=300,a=0.3'
+    file_path5 = 'Vt=300,V0=300,a=0.3'
+    file_path6 = 'Vt=500,V0=300,a=0.3'
 
-    file_path_list = [ file_path1, file_path2, file_path3, file_path4, file_path5, file_path6, file_path7]
+    file_path_list = [ file_path1, file_path2, file_path3, file_path4, file_path5, file_path6]
+
     file_path_list = [os.path.join(folder_path, path) for path in file_path_list]
 
     path_num = len(file_path_list)
@@ -127,7 +134,7 @@ def analyze_dilution_factor_and_Nloc():
     plot_dilution_factor_and_Nloc_change_Vt(mode_number_list, dilution_factor_list, same_PES_Nloc_list, diff_PES_Nloc_list, save_bool , fig_path = folder_path)
 
     # plot dilution factor vs N_loc_same_PES when Vt=0
-    plot_same_PES_Nloc_vs_dilution_factor(same_PES_Nloc_list, dilution_factor_list)
+    plot_same_PES_Nloc_vs_dilution_factor(same_PES_Nloc_list, dilution_factor_list, folder_path, save_bool)
 
 def plot_dilution_factor_and_Nloc_single_state_change_V0(same_PES_Nloc, diff_PES_Nloc, mode_num, dilution_factor, ax):
     '''

@@ -102,7 +102,7 @@ def Analyze_survival_prob_all_state(file_path , save_bool):
     max_state_energy = state_energy[state_energy_index[0]]
     survival_prob_list_trans = np.transpose(survival_prob_list)
 
-    for i in range(10):
+    for i in range(3):
         index = i
         if mode_number_list[state_energy_index[index]][0] == 0:
             label = '$|n_{e}> = $|0>'
@@ -115,7 +115,7 @@ def Analyze_survival_prob_all_state(file_path , save_bool):
 
     ax1.set_xlabel('Time')
     ax1.set_ylabel('survival prob')
-    ax1.set_yscale('log')
+    # ax1.set_yscale('log')
     ax1.set_title('survival prob for single state')
 
 
@@ -124,7 +124,7 @@ def Analyze_survival_prob_all_state(file_path , save_bool):
         fig_path = os.path.join(file_path , fig_name)
         fig.savefig(fig_path)
 
-        fig1_name = "P(t) vs time.png"
+        fig1_name = "P(t) vs time.svg"
         fig1_path = os.path.join(file_path, fig1_name)
         fig1.savefig(fig1_path)
 
@@ -135,7 +135,7 @@ def compare_survival_prob_subroutine(file_path_list, label_list, mode_index,  fi
     spec = gridspec.GridSpec(nrows=1, ncols=1, figure=fig)
     ax = fig.add_subplot(spec[0,0])
 
-    final_time = 1
+    final_time = 5
 
     mode_number_list = []
     for i in range(file_num):
@@ -154,7 +154,7 @@ def compare_survival_prob_subroutine(file_path_list, label_list, mode_index,  fi
     ax.set_yscale('log')
 
     if save_bool:
-        fig_name = "P(t) vs time diff file.png"
+        fig_name = "P(t) vs time diff file.svg"
         fig_path = os.path.join(fig_file_path, fig_name)
         fig.savefig(fig_path)
 

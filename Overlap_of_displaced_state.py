@@ -27,6 +27,10 @@ def Overlap_n_m_approx(alpha, m ,n):
     # result1 = np.exp(- np.power(alpha,2)) * np.power( (np.power(alpha,2) * n) , (m-n)/2) / (np.math.factorial(m-n)) * factor_approx
 
     result1 = np.exp(-  np.power(alpha,2)) * special.jv(m-n ,2 * (alpha * np.sqrt(n)) )
+
+    if n!=0:
+        result1 = result1 * np.power(m/n, m/2) * np.exp((n-m)/2)
+
     return result1
 
 def Overlap_n_m_component(alpha, m, n):
@@ -98,12 +102,15 @@ def analyze_single_Franck_condon_factor():
     print("<n|alpha;m> estimate2 : " + str(round(X_estimate2 , 2)))
 
     plt.show()
+
+
 def plot_Franck_condon_factor():
     '''
     compute franck condon factor for <m| alpha;n>
     :return:
     '''
-    alpha = 1
+    save_bool = False
+    alpha = 0.169
 
     qn_cutoff = 20
 
@@ -133,12 +140,24 @@ def plot_Franck_condon_factor():
     spec1 = gridspec.GridSpec(nrows=1, ncols=1, figure=fig1)
     ax1 = fig1.add_subplot(spec1[0,0])
 
-    ax1.plot(col_index_list , np.abs(franck_condon_table_approx[row_index_to_plot]) , label = 'n = ' + str(row_index_to_plot) + " approx" , marker = 'o')
+    ax1.plot(col_index_list , np.abs(franck_condon_table_approx[row_index_to_plot]) , label = 'n = ' + str(row_index_to_plot) + " approx" , marker = 'o', markersize = 8 , linewidth = 3)
 
-    ax1.plot( col_index_list, np.abs(franck_condon_table[row_index_to_plot]) , label = 'n = ' + str(row_index_to_plot) , marker = 'o')
+    ax1.plot( col_index_list, np.abs(franck_condon_table[row_index_to_plot]) , label = 'n = ' + str(row_index_to_plot) , marker = 'o' , markersize = 8 , linewidth = 3)
     ax1.legend(loc = 'best')
+    ax1.set_xticks([0,2,4,6,8,10,12,14,16,18,20])
 
     print( np.round( franck_condon_table, 3) )
+
+    if save_bool:
+        folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/result 2022.10.06/paper fig/Appendix Franck Condon/"
+        fig_name = 'Franck condon factor approximation.svg'
+        fig_path = os.path.join(folder_path, fig_name)
+
+        fig1.savefig(fig_path)
+
+    print("effective number of coupling: ")
+    effective_number = 1 / np.sum(np.power(franck_condon_table[row_index_to_plot] , 4))
+    print(str(effective_number))
 
     plt.show()
 
@@ -268,3 +287,21 @@ def analyze_coupling_strength():
     coupling_strength = coupling * franck_condon_factor
 
     print(coupling_strength)
+
+
+def effective_num_coupling_submodule( alpha, qn ):
+    '''
+
+    :return:
+    '''
+    qn_cutoff = 15
+    franck_condon_factor_list = np.zeros([qn_cutoff + 1])
+    for j in range(qn_cutoff + 1):
+        # <m | alpha;n>
+        franck_condon_factor = Overlap_n_m(alpha, qn, j)
+        franck_condon_factor_list[j] = franck_condon_factor
+
+    effective_num = 1/ np.sum( np.power(franck_condon_factor_list , 4) )
+
+    return effective_num
+
