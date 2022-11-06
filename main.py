@@ -12,7 +12,7 @@ from Analyze_Nloc_with_dilution_factor import analyze_dilution_factor_and_Nloc, 
 
 from nonadiabatic_transition_factor_T import compare_nonadiabatic_T_and_Nloc
 from anharmonic_transition_factor_T import compare_anharmonic_Nloc_and_transition_factor_T
-from Analyze_T_with_dilution_factor import analyze_dilution_factor_and_T
+from Analyze_T_with_dilution_factor import analyze_dilution_factor_and_T_phsae_diagram,  plot_dilution_factor_and_anharmonic_T
 
 def main():
     matplotlib.rcParams.update({'font.size': 20})
@@ -28,9 +28,6 @@ def main():
     # analyze dilution factor with Nloc : for LW transition
     # analyze_dilution_factor_and_Nloc()
     # analyze_dilution_factor_and_Nloc_change_V0()
-
-    # input_folder_path ="/home/phyzch/CLionProjects/4_point_correlation_calculation/result/spin_boson_LW_model/Duschrinsky_rotation/Batch_simulation_45_long_time/"
-    # Generate_input_files(input_folder_path)
 
     # compute Franck condon factor
     # plot_Franck_condon_factor()
@@ -48,7 +45,8 @@ def main():
     # compare_nonadiabatic_T_and_Nloc()
     # compare_anharmonic_Nloc_and_transition_factor_T()
 
-    analyze_dilution_factor_and_T()
+    # plot_dilution_factor_and_anharmonic_T()
+    analyze_dilution_factor_and_T_phsae_diagram()
 
     plt.show()
 
@@ -69,22 +67,23 @@ def plot_IPR_and_survival_prob_simulation_result():
     Analyze_survival_prob_all_state(folder_path, save_bool)
 
 def compare_survival_prob_and_IPR():
-    save_bool = False
-    folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/Bchl 5mode/compare self-anharmonicity/"
+    save_bool = True
+    folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/Bchl 5mode/effect of nonadiabatic coupling/"
 
-    file_path1 = "Vt=300,V0=300,a=0.3"
-    file_path2 = "Vt=300, dE=600,a=0.3,D=30000"
+    file_path1 = "Vt=0"
+    file_path2 = "Vt=100"
+    file_path3 = "Vt=353"
 
-    file_path_list = [ file_path1, file_path2]
+    file_path_list = [ file_path1, file_path3]
     file_path_list = [os.path.join(folder_path, path) for path in file_path_list]
 
 
-    label1 = 'Vt=353, no self-anharmonicity'
-    label2 =  'Vt=353, self-anharmonicity'
+    label1 = 'Vt=0'
+    label2 =  'Vt=100'
+    label3 = 'Vt=353'
+    label_list = [ label1,  label3]
 
-    label_list = [ label1, label2]
-
-    mode_index = 5
+    mode_index = 1
 
     compare_survival_prob_subroutine(file_path_list, label_list, mode_index, folder_path, save_bool )
     # compare_IPR_subroutine(file_path_list, label_list, mode_index, folder_path, save_bool)

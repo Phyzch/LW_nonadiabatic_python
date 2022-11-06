@@ -43,7 +43,7 @@ def compare_nonadiabatic_T_and_Nloc():
     :return:
     '''
     save_bool = False
-    folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/Bchl 5mode/batch_simulation_dE=600/"
+    folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/Bchl 5mode/batch_simulation_phase_diagram/batch_simulation_dE=600/"
 
     file_path2 = 'Vt=50,V0=300,a=0.3'
     file_path3 = 'Vt=100,V0=300,a=0.3'
@@ -122,6 +122,8 @@ def compare_nonadiabatic_T_and_Nloc():
     x_range = np.linspace(np.min(nonadiabatic_T_list_flatten_log ) , np.max(nonadiabatic_T_list_flatten_log ) , 100)
     y_range = a0 + a1 * x_range
 
+    print("fit slope a1: " + str(a1))
+    print("interval a0: " + str(a0))
     ax2.plot(x_range, y_range, linewidth = 2 )
 
     plt.show()

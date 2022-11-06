@@ -305,3 +305,10 @@ def effective_num_coupling_submodule( alpha, qn ):
 
     return effective_num
 
+
+# qn = np.array([0,1,3,0,1])
+# alpha = 0.17
+# K = 1
+# for i in range(len(qn)):
+#     K = K * effective_num_coupling_submodule(alpha, qn[i])
+# print( np.sqrt(K) )
