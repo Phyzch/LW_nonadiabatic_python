@@ -1,7 +1,8 @@
 from util import *
 from Analyze_survival_prob import compute_dilution_factor
-from anharmonic_transition_factor_T import estimate_anharmonic_transition_factor_T, estimate_anharmonic_transition_factor_T_method2
-from nonadiabatic_transition_factor_T import analyze_nonadiabatic_transition_factor
+from anharmonic_transition_factor_T import estimate_anharmonic_transition_factor_T_state_lists
+from nonadiabatic_transition_factor_T import analyze_nonadiabatic_transition_factor_lists
+
 
 def read_Vq(file_path):
     '''
@@ -40,48 +41,6 @@ def read_Vq(file_path):
 
         return state_num, mode_num, mode_index_list, Vq_list
 
-def estimate_anharmonic_transition_factor_T_state_lists(V0, scaling_factor, mode_number_list):
-    '''
-
-    :param V0:
-    :param scaling_factor:
-    :param mode_number_list:
-    :return:
-    '''
-    T_list = []
-    length = len(mode_number_list)
-    for i in range(length):
-        mode_number = mode_number_list[i]
-        T = estimate_anharmonic_transition_factor_T(V0, scaling_factor, mode_number)
-        T_list.append(T)
-
-    return T_list
-
-def estimate_anharmonic_transition_factor_T_state_lists_method2(Vq_list):
-    T_list = []
-    length = len(Vq_list)
-    for i in range(length):
-        Vq = Vq_list[i]
-        T = estimate_anharmonic_transition_factor_T_method2(Vq)
-        T_list.append(T)
-
-    return T_list
-
-def analyze_nonadiabatic_transition_factor_lists(mode_number_list, Vt):
-    '''
-
-    :param mode_number_list:
-    :param Vt:
-    :return:
-    '''
-    T_prime_list = []
-    length = len(mode_number_list)
-    for i in range(length):
-        mode_number = mode_number_list[i]
-        T_prime = analyze_nonadiabatic_transition_factor(mode_number, Vt)
-        T_prime_list.append(T_prime)
-
-    return T_prime_list
 
 def plot_dilution_factor_and_anharmonic_T():
     '''
@@ -145,6 +104,19 @@ def plot_dilution_factor_and_anharmonic_T():
         fig_name = os.path.join(folder_path, fig_name)
         fig.savefig(fig_name)
 
+def analyze_dilution_factor_and_T_phase_diagram_main():
+    '''
+
+    :return:
+    '''
+    # analyze_dilution_factor_and_T_phsae_diagram()
+
+    # analyze_dilution_factor_and_T_phsae_diagram_strong_EV_case()
+
+    # analyze_dilution_factor_and_T_phsae_diagram_no_ground_state_energy_offset()
+
+    analyze_dilution_factor_and_T_phsae_diagram_EV_for_exciton()
+
 def analyze_dilution_factor_and_T_phsae_diagram():
     '''
     See section 2.3.2 in Leitner 2015 Quantum ergodicity and energy flow in molecules
@@ -189,7 +161,101 @@ def analyze_dilution_factor_and_T_phsae_diagram():
     file_path_list = file_path_list + file_path_list2
 
     Vt_list = [0, 50, 100, 200, 300, 500, 0 , 100, 300, 500,  0 ,100, 300, 500]
+    alpha_list = np.array([ 0.169, 0.163, 0.127, 0.101, 0.101])
 
+    analyze_dilution_factor_and_T_subroutine(folder_path, file_path_list, Vt_list, V0, scaling_factor, alpha_list,
+                                             save_bool)
+
+
+def analyze_dilution_factor_and_T_phsae_diagram_strong_EV_case():
+    '''
+    See section 2.3.2 in Leitner 2015 Quantum ergodicity and energy flow in molecules
+    :return:
+    '''
+    # anharmonic coupling
+    V0 = 300
+    scaling_factor = 0.3
+
+    save_bool = False
+    folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/Bchl 5mode/strong EV coupling model/large_qn_space/"
+
+    file_path1 = 'Vt=0'
+    file_path2 = 'Vt=30'
+    file_path3 = 'Vt=50'
+    file_path4 = 'Vt=70'
+    file_path5 = 'Vt=100'
+    file_path6 = 'Vt=150'
+    file_path7 = 'Vt=200'
+
+    file_path_list = [ file_path1, file_path2, file_path3, file_path4, file_path5, file_path6, file_path7]
+    file_path_list = [os.path.join(folder_path, path) for path in file_path_list]
+
+
+    Vt_list = [0, 30, 50, 70, 100, 150, 200]
+    alpha_list = np.array([ 0.4, 0.4, 0.4, 0.4, 0.4])
+
+    analyze_dilution_factor_and_T_subroutine(folder_path, file_path_list, Vt_list, V0, scaling_factor, alpha_list,
+                                             save_bool)
+
+
+def analyze_dilution_factor_and_T_phsae_diagram_no_ground_state_energy_offset():
+    '''
+    See section 2.3.2 in Leitner 2015 Quantum ergodicity and energy flow in molecules
+    :return:
+    '''
+    # anharmonic coupling
+    V0 = 300
+    scaling_factor = 0.3
+
+    save_bool = True
+    folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/Bchl 5mode/batch_simulation_phase_diagram/batch_simulationo_dE=0/"
+
+    file_path1 = 'Vt=0'
+    file_path2 = 'Vt=100'
+    file_path3 = 'Vt=300'
+    file_path4 = 'Vt=500'
+
+    file_path_list = [ file_path1, file_path2, file_path3, file_path4]
+    file_path_list = [os.path.join(folder_path, path) for path in file_path_list]
+
+
+    Vt_list = [0, 100, 300, 500]
+    alpha_list = np.array([ 0.169, 0.163, 0.127, 0.101, 0.101])
+
+    analyze_dilution_factor_and_T_subroutine(folder_path, file_path_list, Vt_list, V0, scaling_factor, alpha_list,
+                                             save_bool)
+
+def analyze_dilution_factor_and_T_phsae_diagram_EV_for_exciton():
+    '''
+
+    :return:
+    '''
+    V0 = 300
+    scaling_factor = 0.3
+
+    save_bool = True
+    folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/Bchl 5mode/batch_simulation_phase_diagram_correct_EV/"
+
+    file_path1 = 'Vt=0'
+    file_path2 = 'Vt=100'
+    file_path3 = 'Vt=300'
+    file_path4 = 'Vt=500'
+
+    file_path_list = [ file_path1, file_path2, file_path3, file_path4]
+    file_path_list = [os.path.join(folder_path, path) for path in file_path_list]
+
+
+    Vt_list = [0, 100, 300, 500]
+    alpha_list = np.array([ 0.239, 0.231, 0.180, 0.143, 0.143])
+
+    analyze_dilution_factor_and_T_subroutine(folder_path, file_path_list, Vt_list, V0, scaling_factor, alpha_list,
+                                             save_bool)
+
+def analyze_dilution_factor_and_T_subroutine(folder_path, file_path_list, Vt_list, V0, scaling_factor, alpha_list, save_bool):
+    '''
+
+    :return:
+    '''
     path_num = len(file_path_list)
 
     T_list = []
@@ -209,7 +275,7 @@ def analyze_dilution_factor_and_T_phsae_diagram():
         T = estimate_anharmonic_transition_factor_T_state_lists(V0, scaling_factor, mode_number_list)
 
         # transition factor in different PES
-        T_prime = analyze_nonadiabatic_transition_factor_lists(mode_number_list, Vt)
+        T_prime = analyze_nonadiabatic_transition_factor_lists(mode_number_list, Vt , alpha_list)
 
         # concatenate list
         T_list = T_list + T
@@ -250,7 +316,7 @@ def analyze_dilution_factor_and_T_phsae_diagram():
 
     ax.set_xlabel("$T$")
     ax.set_ylabel(" $T'$ ")
-    ax.set_ylim([-0.05,0.5])
+    ax.set_ylim([-0.05, 0.7 ])
 
     if save_bool:
         fig_name = "dilution factor vs T.svg"

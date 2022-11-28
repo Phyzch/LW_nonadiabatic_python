@@ -10,9 +10,13 @@ from Overlap_of_displaced_state import compute_LW_factor
 from Analyze_survival_prob import Analyze_survival_prob_all_state, compare_survival_prob_subroutine
 from Analyze_Nloc_with_dilution_factor import analyze_dilution_factor_and_Nloc, analyze_dilution_factor_and_Nloc_change_V0
 
-from nonadiabatic_transition_factor_T import compare_nonadiabatic_T_and_Nloc
+from nonadiabatic_transition_factor_T import compare_nonadiabatic_T_and_Nloc, analyze_nonadiabatic_connectivity_K_regarding_EV_coupling_coeff
 from anharmonic_transition_factor_T import compare_anharmonic_Nloc_and_transition_factor_T
-from Analyze_T_with_dilution_factor import analyze_dilution_factor_and_T_phsae_diagram,  plot_dilution_factor_and_anharmonic_T
+from Analyze_T_with_dilution_factor import analyze_dilution_factor_and_T_phase_diagram_main,  plot_dilution_factor_and_anharmonic_T
+
+from dilution_factor_with_respect_to_barrier_height import  plot_dilution_factor_vs_energy, plot_dilution_factor_vs_energy_strong_EV_coupling
+
+from Analyze_electronic_survival_prob import plot_electronic_survival_prob_with_vib_survival_prob , Analyze_electronic_dilution_factor_with_T_phase_diagram
 
 def main():
     matplotlib.rcParams.update({'font.size': 20})
@@ -24,6 +28,8 @@ def main():
     # Analyze_IPR_different_condition()
 
     # compare_survival_prob_and_IPR()
+
+    # plot_electronic_survival_prob_with_vib_survival_prob()
 
     # analyze dilution factor with Nloc : for LW transition
     # analyze_dilution_factor_and_Nloc()
@@ -43,10 +49,17 @@ def main():
     # plot_spectral_density_BChl()
 
     # compare_nonadiabatic_T_and_Nloc()
+    # analyze_nonadiabatic_connectivity_K_regarding_EV_coupling_coeff()
     # compare_anharmonic_Nloc_and_transition_factor_T()
 
     # plot_dilution_factor_and_anharmonic_T()
-    analyze_dilution_factor_and_T_phsae_diagram()
+    analyze_dilution_factor_and_T_phase_diagram_main()
+
+    # plot dilution factor for state at different energy and compared with barier height. (also distinguish between different electronic state)
+    # plot_dilution_factor_vs_energy()
+    # plot_dilution_factor_vs_energy_strong_EV_coupling()
+
+    # Analyze_electronic_dilution_factor_with_T_phase_diagram()
 
     plt.show()
 
@@ -54,8 +67,8 @@ def main():
 def plot_IPR_and_survival_prob_simulation_result():
 
     parent_file_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/"
-    folder_path = "Bchl 5mode/Vt=353/Vt=353,V0=0"
-    # folder_path = "BChl try/"
+    folder_path = "Bchl 5mode/strong EV coupling model/large_qn_space/Vt=200/"
+    # folder_path = "BChl center off/"
 
     folder_path = os.path.join(parent_file_path, folder_path)
 
@@ -67,7 +80,7 @@ def plot_IPR_and_survival_prob_simulation_result():
     Analyze_survival_prob_all_state(folder_path, save_bool)
 
 def compare_survival_prob_and_IPR():
-    save_bool = True
+    save_bool = False
     folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/Bchl 5mode/effect of nonadiabatic coupling/"
 
     file_path1 = "Vt=0"

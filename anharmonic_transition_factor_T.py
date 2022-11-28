@@ -139,3 +139,30 @@ def compare_anharmonic_Nloc_and_transition_factor_T():
     plt.show()
 
 # estimate_anharmonic_transition_factor_T_single_state()
+def estimate_anharmonic_transition_factor_T_state_lists(V0, scaling_factor, mode_number_list):
+    '''
+
+    :param V0:
+    :param scaling_factor:
+    :param mode_number_list:
+    :return:
+    '''
+    T_list = []
+    length = len(mode_number_list)
+    for i in range(length):
+        mode_number = mode_number_list[i]
+        T = estimate_anharmonic_transition_factor_T(V0, scaling_factor, mode_number)
+        T_list.append(T)
+
+    return T_list
+
+
+def estimate_anharmonic_transition_factor_T_state_lists_method2(Vq_list):
+    T_list = []
+    length = len(Vq_list)
+    for i in range(length):
+        Vq = Vq_list[i]
+        T = estimate_anharmonic_transition_factor_T_method2(Vq)
+        T_list.append(T)
+
+    return T_list

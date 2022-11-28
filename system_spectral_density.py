@@ -22,13 +22,21 @@ def plot_spectral_density_BChl():
 
 
     # selected vibrational state
-    selected_frequency = np.array( [
-        890, 727, 345, 1117, 1158
-    ] )
+    # selected_frequency = np.array( [
+    #     890, 727, 345, 1117, 1158
+    # ] )
+    #
+    # selected_reorganization_energy = np.array([
+    #     25.3, 19.3, 5.6, 11.5, 11.9
+    # ])
 
-    selected_reorganization_energy = np.array([
-        25.3, 19.3, 5.6, 11.5, 11.9
-    ])
+    # 12 modes most significantly coupled to electronic dof. See Table III of J. Chem. Phys. 134, 024506 (2011)
+    selected_frequency = np.array(
+        [191, 345, 565, 727, 776, 890, 1019, 1117, 1137, 1158, 1289, 1378]
+    )
+    selected_reorganization_energy = np.array(
+        [3.7, 5.6, 4.6, 19.3, 7.4, 25.3, 9.9, 11.5, 4.8, 11.9, 11.2, 11.9]
+    )
 
     selected_spectral_density = selected_frequency * selected_reorganization_energy
     selected_Huang_Rhys_factor = selected_reorganization_energy / selected_frequency

@@ -4,14 +4,12 @@ from Overlap_of_displaced_state import effective_num_coupling_submodule
 from util import *
 from Analyze_Nloc_with_dilution_factor import read_Nloc_anharmonic_nonadiabatic_coupling
 
-def analyze_nonadiabatic_transition_factor(qn_list, Vt):
+def analyze_nonadiabatic_transition_factor(qn_list, Vt, alpha_list):
     '''
     Vt: nonadiabatic coupling strength
     qn_list : quantum number
     :return:
     '''
-    alpha_list = np.array([ 0.169, 0.163, 0.127, 0.101, 0.101])
-
     mode_num = len(qn_list)
     effective_num_list = np.zeros([mode_num])
     for i in range(mode_num):
@@ -37,6 +35,48 @@ def analyze_nonadiabatic_transition_factor(qn_list, Vt):
 
     return T
 
+def analyze_nonadiabatic_connectivity_K_regarding_EV_coupling_coeff():
+    '''
+    EV coupling coefficient alpha
+    :return:
+    '''
+    save = False
+    folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/result 2022.10.06/paper fig/"
+
+    alpha_list = np.array([0.1,0.2,0.3,0.4,0.5])
+    alpha_num = len(alpha_list)
+
+    qn_list = np.array(range(0,7))
+    qn_num = len(qn_list)
+
+    K_list = np.zeros([alpha_num, qn_num])
+    for i in range(alpha_num):
+        for j in range(qn_num):
+            alpha = alpha_list[i]
+            qn = int(qn_list[j])
+            K = effective_num_coupling_submodule(alpha, qn)
+            K_list[i,j] = K
+
+    fig = plt.figure(figsize=(10, 10))
+    spec = gridspec.GridSpec(nrows=1, ncols=1, figure=fig)
+    ax = fig.add_subplot(spec[0,0])
+
+    for i in range(alpha_num):
+        alpha = alpha_list[i]
+        ax.plot(qn_list, K_list[i], linewidth = 2, marker = 'o'
+                ,label = '$\u03B1$ = '+ str(alpha))
+
+    ax.legend(loc = 'best')
+    ax.set_xlabel('n')
+    ax.set_ylabel('$K_{i}$')
+
+    plt.show()
+
+    if save:
+        fig_name = "Ki vs alpha.svg"
+        fig_path = os.path.join(folder_path, fig_name)
+        fig.savefig(fig_path)
+
 def compare_nonadiabatic_T_and_Nloc():
     '''
 
@@ -55,6 +95,7 @@ def compare_nonadiabatic_T_and_Nloc():
     file_path_list = [os.path.join(folder_path, path) for path in file_path_list]
 
     Vt_list = [ 50, 100, 200, 300 , 500]
+    alpha_list = np.array([ 0.169, 0.163, 0.127, 0.101, 0.101])
 
     path_num = len(file_path_list)
 
@@ -74,7 +115,7 @@ def compare_nonadiabatic_T_and_Nloc():
         nonadiabatic_T = []
         for j in range(state_num):
             qn_list = mode_index_list[j]
-            nonadiabatic_T_element  = analyze_nonadiabatic_transition_factor(qn_list, Vt)
+            nonadiabatic_T_element  = analyze_nonadiabatic_transition_factor(qn_list, Vt, alpha_list)
             nonadiabatic_T.append(nonadiabatic_T_element)
 
         nonadiabatic_T_list.append(nonadiabatic_T)
@@ -131,3 +172,28 @@ def compare_nonadiabatic_T_and_Nloc():
         file_name = "T(solid) vs Nloc(dashed).svg"
         file_name = os.path.join(folder_path, file_name)
         fig.savefig(file_name)
+
+
+def analyze_nonadiabatic_transition_factor_lists(mode_number_list, Vt, alpha_list):
+    '''
+
+    :param mode_number_list:
+    :param Vt:
+    :return:
+    '''
+    T_prime_list = []
+    length = len(mode_number_list)
+    for i in range(length):
+        mode_number = mode_number_list[i]
+        T_prime = analyze_nonadiabatic_transition_factor(mode_number, Vt, alpha_list)
+        T_prime_list.append(T_prime)
+
+    return T_prime_list
+
+
+Vt = 30
+qn_list = np.array([1,1,2,0,0])
+# alpha_list = np.array([ 0.169, 0.163, 0.127, 0.101, 0.101]) * np.sqrt(2)
+alpha_list = np.array([0.4,0.4,0.4,0.4,0.4])
+T_prime = analyze_nonadiabatic_transition_factor(qn_list, Vt, alpha_list)
+print(T_prime)

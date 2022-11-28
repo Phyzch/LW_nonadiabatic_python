@@ -115,9 +115,10 @@ def Analyze_survival_prob_all_state(file_path , save_bool):
 
     ax1.set_xlabel('Time')
     ax1.set_ylabel('survival prob')
-    # ax1.set_yscale('log')
     ax1.set_title('survival prob for single state')
 
+    ax1.set_yscale('log')
+    # ax1.set_xscale('log')
 
     if save_bool:
         fig_name = "energy vs dilution factor.png"
