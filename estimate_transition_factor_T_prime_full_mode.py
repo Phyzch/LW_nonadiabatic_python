@@ -59,27 +59,30 @@ def estimate_T_prime_prefactor_full_mode():
     return T_prime_prefactor
 
 
-def plot_E_scaling_factor_phase_diagram_for_full_mode_BChl():
+def estimate_T_prime_prefactor_12_modes_largest_EV():
+    '''
+
+    :return:
+    '''
+    frequency_list = np.array([ 187, 335, 566, 730, 760, 895, 1020, 1115, 1131, 1162, 1281, 1376 ])
+
+    # data source : Table II , III of J. Chem. Phys. 134, 024506 (2011)
+    Huang_Rhys_factor = 1 / 1000 * np.array([19.6, 16.1, 8.1, 26.6, 9.5, 28.4, 9.7, 10.3, 4.2, 10.3, 8.7, 8.6])
+
+    EV_coupling_alpha = np.sqrt(Huang_Rhys_factor)
+
+    T_prime_prefactor = estimate_T_prime_prefactor_subroutine(EV_coupling_alpha, frequency_list)
+
+    return T_prime_prefactor
+
+
+
+def plot_E_scaling_factor_phase_diagram_for_BChl( frequency_list, Huang_Rhys_factor, scaling_factor_estimate):
     '''
 
     :return:
     '''
     matplotlib.rcParams.update({'font.size': 20})
-    frequency_list = np.array([  84,  167,  183,  191,  214,  239,  256,  345,  368,  388,  407,
-        423,  442,  473,  506,  565,  587,  623,  684,  696,  710,  727,
-        776,  803,  845,  858,  890,  915,  967,  980, 1001, 1019, 1066,
-       1089, 1105, 1117, 1137, 1158, 1180, 1190, 1211, 1229, 1252, 1289,
-       1378, 1466, 1519, 1539, 1648, 1680])
-
-    dof = len(frequency_list)
-    geometric_mean_freq = np.prod(np.power(frequency_list , 1/dof))
-    scaling_factor_estimate = 1/270 * np.sqrt( geometric_mean_freq )
-
-    # data source : Table II of J. Chem. Phys. 134, 024506 (2011)
-    Huang_Rhys_factor = 1/1000 * np.array([15.1, 8.1, 7.2, 19.6, 4.6, 7.8, 5.5, 16.1, 6.0, 4.1, 5.2, 2.9, 2.3, 1.7,
-                                           1.6, 8.1, 3.9, 5.8, 2.3, 2.5, 1.8, 26.6, 9.5, 4.2, 2.5, 2.5,
-                                           28.4, 4.8, 2.7, 3.1, 4.0, 9.7, 2.5, 2.1, 2.1, 10.3, 4.2,
-                                           10.3, 2.5, 3.1, 2.5, 2.1, 2.5, 8.7, 8.6, 2.1, 1.7, 2.3, 2.5, 2.7])
 
     # for exciton energy transfer, we need to multiply it by sqrt(2)
     Huang_Rhys_factor = Huang_Rhys_factor * np.sqrt(2)
@@ -128,4 +131,45 @@ def plot_E_scaling_factor_phase_diagram_for_full_mode_BChl():
 
     plt.show()
 
-plot_E_scaling_factor_phase_diagram_for_full_mode_BChl()
+
+def plot_E_scaling_factor_phase_diagram_for_full_mode_BChl():
+    '''
+
+    :return:
+    '''
+    frequency_list = np.array([  84,  167,  183,  191,  214,  239,  256,  345,  368,  388,  407,
+        423,  442,  473,  506,  565,  587,  623,  684,  696,  710,  727,
+        776,  803,  845,  858,  890,  915,  967,  980, 1001, 1019, 1066,
+       1089, 1105, 1117, 1137, 1158, 1180, 1190, 1211, 1229, 1252, 1289,
+       1378, 1466, 1519, 1539, 1648, 1680])
+
+    # data source : Table II of J. Chem. Phys. 134, 024506 (2011)
+    Huang_Rhys_factor = 1/1000 * np.array([15.1, 8.1, 7.2, 19.6, 4.6, 7.8, 5.5, 16.1, 6.0, 4.1, 5.2, 2.9, 2.3, 1.7,
+                                           1.6, 8.1, 3.9, 5.8, 2.3, 2.5, 1.8, 26.6, 9.5, 4.2, 2.5, 2.5,
+                                           28.4, 4.8, 2.7, 3.1, 4.0, 9.7, 2.5, 2.1, 2.1, 10.3, 4.2,
+                                           10.3, 2.5, 3.1, 2.5, 2.1, 2.5, 8.7, 8.6, 2.1, 1.7, 2.3, 2.5, 2.7])
+    dof = len(frequency_list)
+    geometric_mean_freq = np.prod(np.power(frequency_list , 1/dof))
+    scaling_factor_estimate = 1/270 * np.sqrt( geometric_mean_freq )
+
+    plot_E_scaling_factor_phase_diagram_for_BChl(frequency_list, Huang_Rhys_factor , scaling_factor_estimate)
+
+def plot_E_scaling_factor_phase_diagram_for_12_mode_BChl():
+    '''
+
+    :return:
+    '''
+    frequency_list = np.array([ 187, 335, 566, 730, 760, 895, 1020, 1115, 1131, 1162, 1281, 1376 ])
+
+    # data source : Table II , III of J. Chem. Phys. 134, 024506 (2011)
+    Huang_Rhys_factor = 1/1000 *  np.array([19.6, 16.1, 8.1, 26.6, 9.5, 28.4, 9.7, 10.3, 4.2, 10.3, 8.7, 8.6])
+
+    # manually input scaling factor list, estimate from mode type. for 12 mode model.
+    scaling_factor_list = np.array([0.1, 0.14, 0.1, 0.1, 0.1, 0.13, 0.1, 0.15, 0.2, 0.17, 0.15, 0.15])
+    dof = len(scaling_factor_list)
+    scaling_factor_estimate = np.prod( np.power(scaling_factor_list, 1/dof) ) # geometric mean
+
+
+    plot_E_scaling_factor_phase_diagram_for_BChl(frequency_list, Huang_Rhys_factor, scaling_factor_estimate)
+
+

@@ -14,9 +14,9 @@ from nonadiabatic_transition_factor_T import compare_nonadiabatic_T_and_Nloc, an
 from anharmonic_transition_factor_T import compare_anharmonic_Nloc_and_transition_factor_T
 from Analyze_T_with_dilution_factor import analyze_dilution_factor_and_T_phase_diagram_main,  plot_dilution_factor_and_anharmonic_T
 
-from dilution_factor_with_respect_to_barrier_height import  plot_dilution_factor_vs_energy, plot_dilution_factor_vs_energy_strong_EV_coupling
+from dilution_factor_with_respect_to_barrier_height import  plot_dilution_factor_vs_energy_main
 
-from Analyze_electronic_survival_prob import plot_electronic_survival_prob_with_vib_survival_prob , Analyze_electronic_dilution_factor_with_T_phase_diagram
+from Analyze_electronic_survival_prob import plot_electronic_survival_prob_with_vib_survival_prob , Analyze_electronic_dilution_factor_with_T_phase_diagram_main
 
 def main():
     matplotlib.rcParams.update({'font.size': 20})
@@ -36,7 +36,7 @@ def main():
     # analyze_dilution_factor_and_Nloc_change_V0()
 
     # compute Franck condon factor
-    # plot_Franck_condon_factor()
+    plot_Franck_condon_factor()
     # analyze_single_Franck_condon_factor()
     # plot_Bessel_function_envolope()
     # analyze_coupling_strength()
@@ -53,13 +53,12 @@ def main():
     # compare_anharmonic_Nloc_and_transition_factor_T()
 
     # plot_dilution_factor_and_anharmonic_T()
-    analyze_dilution_factor_and_T_phase_diagram_main()
+    # analyze_dilution_factor_and_T_phase_diagram_main()
 
     # plot dilution factor for state at different energy and compared with barier height. (also distinguish between different electronic state)
-    # plot_dilution_factor_vs_energy()
-    # plot_dilution_factor_vs_energy_strong_EV_coupling()
+    # plot_dilution_factor_vs_energy_main()
 
-    # Analyze_electronic_dilution_factor_with_T_phase_diagram()
+    # Analyze_electronic_dilution_factor_with_T_phase_diagram_main()
 
     plt.show()
 

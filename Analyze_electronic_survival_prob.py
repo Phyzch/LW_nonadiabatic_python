@@ -104,17 +104,42 @@ def plot_electronic_survival_prob_with_vib_survival_prob():
 
     plt.show()
 
+def Analyze_electronic_dilution_factor_with_T_phase_diagram_main():
 
-def Analyze_electronic_dilution_factor_with_T_phase_diagram():
+    Analyze_electronic_dilution_factor_with_T_phase_diagram_offset_0()
+
+    # Analyze_electronic_dilution_factor_with_T_phase_diagram_offset_600()
+
+def Analyze_electronic_dilution_factor_with_T_phase_diagram_offset_0():
     '''
-    See Leitner's review paper (2015) for estimation formula for T.
+
     :return:
     '''
-    # anharmonic coupling
     V0 = 300
     anharmonic_scaling_factor = 0.3
 
-    save_bool = True
+    folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/" \
+                  "Bchl 5mode/batch_simulation_phase_diagram/batch_simulation_all_with_electronic_survival_prob"
+
+    file_path1 = "Vt=0"
+    file_path2 = "Vt=100"
+    file_path3 = "Vt=300"
+    file_path4 = "Vt=500"
+
+    file_path_list = [file_path1, file_path2, file_path3, file_path4]
+    file_path_list = [os.path.join(folder_path, file_path) for file_path in file_path_list]
+
+    Vt_list = [0, 100, 300, 500]
+    alpha_list = np.array([0.169, 0.163, 0.127, 0.101, 0.101])
+
+def Analyze_electronic_dilution_factor_with_T_phase_diagram_offset_600():
+    '''
+
+    :return:
+    '''
+    V0 = 300
+    anharmonic_scaling_factor = 0.3
+
     folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/" \
                   "Bchl 5mode/batch_simulation_phase_diagram/batch_simulation_all_with_electronic_survival_prob"
 
@@ -128,6 +153,19 @@ def Analyze_electronic_dilution_factor_with_T_phase_diagram():
 
     Vt_list = [0,100,300,500]
     alpha_list = np.array([ 0.169, 0.163, 0.127, 0.101, 0.101])
+
+    Analyze_electronic_dilution_factor_with_T_phase_diagram_subroutine(V0, anharmonic_scaling_factor, folder_path,
+                                                                       file_path_list, Vt_list, alpha_list)
+
+def Analyze_electronic_dilution_factor_with_T_phase_diagram_subroutine(V0, anharmonic_scaling_factor, folder_path, file_path_list, Vt_list, alpha_list):
+    '''
+    See Leitner's review paper (2015) for estimation formula for T.
+    :return:
+    '''
+    # anharmonic coupling
+
+
+    save_bool = True
 
     T_list = []
     T_prime_list = []

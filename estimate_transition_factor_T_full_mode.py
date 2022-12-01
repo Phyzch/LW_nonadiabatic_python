@@ -99,4 +99,36 @@ def estimate_transition_factor_full_mode():
     ax.set_ylabel('T')
     plt.show()
 
+def estimate_transition_factor_12_most_strongly_coupled_mode():
+    '''
 
+    :return:
+    '''
+    matplotlib.rcParams.update({'font.size': 20})
+
+    frequency_list = np.array([187, 335, 566, 730, 760, 895, 1020, 1115, 1131, 1162, 1281, 1376])
+
+    scaling_factor_list = np.array([0.1, 0.14, 0.1, 0.1, 0.1, 0.13, 0.1, 0.15, 0.2, 0.17, 0.15, 0.15])
+    dof = len(scaling_factor_list)
+
+    scaling_factor = np.prod( np.power(scaling_factor_list, 1/dof) ) # geometric mean
+
+    data_num = 20
+    energy_list = np.linspace(0, 4000, data_num)
+    Tq_list = np.zeros([data_num])
+
+    for i in range(data_num):
+        energy = energy_list[i]
+        Tq = estimate_transition_factor_with_freq_and_energy(energy, frequency_list, scaling_factor)
+        Tq_list[i] = Tq
+
+    fig = plt.figure(figsize=(10, 10))
+    spec = gridspec.GridSpec(nrows=1, ncols=1, figure=fig)
+    ax = fig.add_subplot(spec[0, 0])
+    ax.plot(energy_list, Tq_list, marker='o', linewidth=2)
+
+    ax.set_xlabel('E')
+    ax.set_ylabel('T')
+    plt.show()
+
+# estimate_transition_factor_12_most_strongly_coupled_mode()

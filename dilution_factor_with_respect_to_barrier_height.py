@@ -22,7 +22,21 @@ def compute_barrier_height(ground_state_energy_shift , EV_coupling_alpha):
     return energy_barrier_height
 
 
-def plot_dilution_factor_vs_energy():
+def plot_dilution_factor_vs_energy_main():
+    '''
+
+    :return:
+    '''
+    # energy shift 600
+    # plot_dilution_factor_vs_energy_dE_600()
+    # large EV coupling
+    # plot_dilution_factor_vs_energy_strong_EV_coupling()
+
+    # energy shift 0
+    plot_dilution_factor_vs_energy_dE_0_correct_EV()
+
+
+def plot_dilution_factor_vs_energy_dE_600():
     '''
 
     :return:
@@ -246,4 +260,115 @@ def plot_dilution_factor_vs_energy_strong_EV_coupling():
     if save_bool:
         fig_name = "dilution factor vs energy.svg"
         fig_path = os.path.join(parent_folder_path , fig_name)
+        fig.savefig(fig_path)
+
+def plot_dilution_factor_vs_energy_dE_0_correct_EV():
+    '''
+
+    :return:
+    '''
+
+    save_bool = False
+
+    ground_state_energy_shift = 0
+    EV_coupling_alpha = np.array([0.239, 0.231, 0.180, 0.143, 0.143])
+    energy_barrier_height = compute_barrier_height(ground_state_energy_shift, EV_coupling_alpha)
+
+    parent_folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/Bchl 5mode/batch_simulation_phase_diagram_correct_EV"
+
+    folder_path_no_coupling1 = "Vt=0/"
+    folder_path_no_coupling_list = [folder_path_no_coupling1]
+    folder_path_no_coupling_list = [os.path.join(parent_folder_path, path) for path in folder_path_no_coupling_list]
+
+    folder_path_with_Vt1 = "Vt=500/"
+
+    folder_path_with_Vt_list = [folder_path_with_Vt1]
+    folder_path_with_Vt_list = [os.path.join(parent_folder_path, path) for path in folder_path_with_Vt_list]
+
+    Vt_list = [0, 500]
+
+    path_num = len(folder_path_no_coupling_list)
+
+    state_energy_list = []
+    electronic_state_list = []
+    dilution_factor_no_coupling_list = []
+    dilution_factor_with_Vt_list = []
+
+    for j in range(2):
+        if j == 0:
+            path_list = folder_path_no_coupling_list
+        else:
+            path_list = folder_path_with_Vt_list
+
+        for i in range(path_num):
+            path = path_list[i]
+
+            vib_state_energy, mode_number, dilution_factor = compute_dilution_factor(path)
+
+            electronic_state = np.array([mode_number_ele[0] for mode_number_ele in mode_number])
+            state_energy = vib_state_energy + electronic_state * ground_state_energy_shift
+
+            if j == 0:
+                electronic_state_list = electronic_state_list + electronic_state.tolist()
+                state_energy_list = state_energy_list + state_energy.tolist()
+
+            if j == 0:
+                dilution_factor_no_coupling_list = dilution_factor_no_coupling_list + dilution_factor.tolist()
+            else:
+                dilution_factor_with_Vt_list = dilution_factor_with_Vt_list + dilution_factor.tolist()
+
+    state_energy_list = np.array(state_energy_list)
+    electronic_state_list = np.array(electronic_state_list)
+    dilution_factor_no_coupling_list = np.array(dilution_factor_no_coupling_list)
+    dilution_factor_with_Vt_list = np.array(dilution_factor_with_Vt_list)
+
+    # plot state on electronic state 1 with triangle symbol , state on electronic state 2 with square symbol
+    marker_list = ["^", "s"]
+    # plot dilution factor without coupling black , dilution factor with coupling red
+    color_list = ['black', 'red']
+
+    electronic0_state_list = [index for index in range(len(electronic_state_list)) if electronic_state_list[index] == 0]
+    electronic1_state_list = [index for index in range(len(electronic_state_list)) if electronic_state_list[index] == 1]
+
+    fig = plt.figure(figsize=(20, 10))
+    spec = gridspec.GridSpec(nrows=1, ncols=2, figure=fig)
+    ax1 = fig.add_subplot(spec[0, 0])
+    ax2 = fig.add_subplot(spec[0, 1])
+
+    ax1.scatter(state_energy_list[electronic0_state_list], dilution_factor_no_coupling_list[electronic0_state_list],
+                color=color_list[0], marker=marker_list[0], label="Vt = " + str(Vt_list[0]) + " electronic state |0>")
+    ax1.scatter(state_energy_list[electronic1_state_list], dilution_factor_no_coupling_list[electronic1_state_list],
+                color=color_list[0], marker=marker_list[1], label="Vt = " + str(Vt_list[0]) + " electronic state |1>")
+
+    ax1.scatter(state_energy_list[electronic0_state_list], dilution_factor_with_Vt_list[electronic0_state_list],
+                color=color_list[1], marker=marker_list[0], label="Vt = " + str(Vt_list[1]) + " electronic state |0>")
+    ax1.scatter(state_energy_list[electronic1_state_list], dilution_factor_with_Vt_list[electronic1_state_list],
+                color=color_list[1], marker=marker_list[1], label="Vt = " + str(Vt_list[1]) + " electronic state |1>")
+
+    ax1.axvline(x=energy_barrier_height, linewidth=3)
+    ax1.set_yscale('log')
+    ax1.legend(loc='best', prop={'size': 10})
+
+    ax1.set_xlabel('E')
+    ax1.set_ylabel('$\sigma$')
+
+    # plot decrease of dilution factor by ratio in ax2
+    dilution_factor_ratio = dilution_factor_with_Vt_list / dilution_factor_no_coupling_list
+
+    ax2.scatter(state_energy_list[electronic0_state_list], dilution_factor_ratio[electronic0_state_list],
+                color='black', marker=marker_list[0], label='electronic state 0')
+
+    ax2.scatter(state_energy_list[electronic1_state_list], dilution_factor_ratio[electronic1_state_list],
+                color='red', marker=marker_list[1], label='electronic state 1')
+
+    ax2.set_xlabel('E')
+    ax2.set_ylabel('$\sigma$($V_{t}=$' + str(Vt_list[1]) + ") / $\sigma$($V_{t}=0$)")
+    ax2.axvline(x=energy_barrier_height, linewidth=3)
+    ax2.legend(loc='best', prop={'size': 10})
+
+    plt.show()
+
+    if save_bool:
+        fig_name = "dilution factor vs energy.svg"
+        fig_path = os.path.join(parent_folder_path, fig_name)
         fig.savefig(fig_path)

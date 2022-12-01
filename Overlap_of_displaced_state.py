@@ -110,11 +110,11 @@ def plot_Franck_condon_factor():
     :return:
     '''
     save_bool = False
-    alpha = 0.4
+    alpha = 0.169
 
     qn_cutoff = 20
 
-    row_index_to_plot = 4
+    row_index_to_plot = 3
 
     franck_condon_table = np.zeros([qn_cutoff , qn_cutoff])
     franck_condon_table_approx = np.zeros([qn_cutoff, qn_cutoff ])
