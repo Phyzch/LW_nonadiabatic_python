@@ -1,4 +1,9 @@
 from util import *
+import sys
+
+home_directory = "/home/phyzch/PycharmProjects/LW_electronic_state/"
+add_sys_path_list = [home_directory, os.path.join(home_directory, "Analyze_dimer_survival_prob")]
+sys.path = sys.path + add_sys_path_list
 
 from Generate_input_file import Generate_input_files
 from Analyze_IPR import Analyze_IPR_all_state,Read_IPR_all_state, Read_local_density_of_state , Search_state, compare_IPR_subroutine
@@ -18,6 +23,9 @@ from dilution_factor_with_respect_to_barrier_height import  plot_dilution_factor
 
 from Analyze_electronic_survival_prob import plot_electronic_survival_prob_with_vib_survival_prob , Analyze_electronic_dilution_factor_with_T_phase_diagram_main
 
+from Analyze_dimer_code.dimer_code_main import Analyze_dimer_code_main
+
+
 def main():
     matplotlib.rcParams.update({'font.size': 20})
 
@@ -36,14 +44,13 @@ def main():
     # analyze_dilution_factor_and_Nloc_change_V0()
 
     # compute Franck condon factor
-    plot_Franck_condon_factor()
+    # plot_Franck_condon_factor()
     # analyze_single_Franck_condon_factor()
     # plot_Bessel_function_envolope()
     # analyze_coupling_strength()
 
     # compute LW factor
     # compute_LW_factor()
-
 
     # Plot spectral density for photosystem
     # plot_spectral_density_BChl()
@@ -60,13 +67,15 @@ def main():
 
     # Analyze_electronic_dilution_factor_with_T_phase_diagram_main()
 
+    Analyze_dimer_code_main()
+
     plt.show()
 
 
 def plot_IPR_and_survival_prob_simulation_result():
 
     parent_file_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/"
-    folder_path = "Bchl 5mode/strong EV coupling model/large_qn_space/Vt=200/"
+    folder_path = "Bchl 5mode/batch_simulation_phase_diagram/batch_simulationo_dE=0/Vt=0/"
     # folder_path = "BChl center off/"
 
     folder_path = os.path.join(parent_file_path, folder_path)

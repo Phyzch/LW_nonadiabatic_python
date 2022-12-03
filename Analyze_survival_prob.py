@@ -111,6 +111,9 @@ def Analyze_survival_prob_all_state(file_path , save_bool):
         label = label + " $|n_{v}>$ = " + str(mode_number_list[state_energy_index[index]][1:])
         label = label + " E = " + str(round( state_energy[state_energy_index[index]], 2))
         ax1.plot(time_list , survival_prob_list_trans[state_energy_index[index]] , label = label , linewidth = 2)
+
+    # ax1.plot(time_list, survival_prob_list_trans[0], linewidth = 2 , label = str(mode_number_list[0][1:]) + "  E = " + str(round(state_energy[0] , 2 )) )
+
     ax1.legend(loc = 'best')
 
     ax1.set_xlabel('Time')
