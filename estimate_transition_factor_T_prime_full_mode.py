@@ -6,7 +6,7 @@ from scipy.optimize import root
 from Overlap_of_displaced_state import effective_num_coupling_submodule
 from estimate_transition_factor_T_full_mode import  estimate_transition_energy
 
-def estimate_T_prime_prefactor_subroutine(EV_coupling_alpha_list, frequency_list):
+def estimate_T_prime_prefactor_subroutine_dimer(EV_coupling_alpha_list, frequency_list):
     '''
      T_prime = Vt * prefactor.
      Here pre_factor is computed here.
@@ -30,12 +30,14 @@ def estimate_T_prime_prefactor_subroutine(EV_coupling_alpha_list, frequency_list
 
     Kt = np.prod(Ki_list)
 
+    Kt_dimer = np.power(Kt, 2)
+
     # estimate the nonadiabatic transition factor T_prime
-    T_prime_prefactor = np.sqrt(2 * np.pi /3) * Dq * np.sqrt(Kt)
+    T_prime_prefactor = np.sqrt(2 * np.pi /3) * Dq * np.sqrt(Kt_dimer)
 
     return T_prime_prefactor
 
-def estimate_T_prime_prefactor_full_mode():
+def estimate_T_prime_prefactor_full_mode_dimer():
     '''
 
     :return:
@@ -54,12 +56,12 @@ def estimate_T_prime_prefactor_full_mode():
 
     EV_coupling_alpha = np.sqrt(Huang_Rhys_factor)
 
-    T_prime_prefactor = estimate_T_prime_prefactor_subroutine(EV_coupling_alpha, frequency_list)
+    T_prime_prefactor = estimate_T_prime_prefactor_subroutine_dimer(EV_coupling_alpha, frequency_list)
 
     return T_prime_prefactor
 
 
-def estimate_T_prime_prefactor_12_modes_largest_EV():
+def estimate_T_prime_prefactor_12_modes_largest_EV_dimer():
     '''
 
     :return:
@@ -71,25 +73,22 @@ def estimate_T_prime_prefactor_12_modes_largest_EV():
 
     EV_coupling_alpha = np.sqrt(Huang_Rhys_factor)
 
-    T_prime_prefactor = estimate_T_prime_prefactor_subroutine(EV_coupling_alpha, frequency_list)
+    T_prime_prefactor = estimate_T_prime_prefactor_subroutine_dimer(EV_coupling_alpha, frequency_list)
 
     return T_prime_prefactor
 
 
 
-def plot_E_scaling_factor_phase_diagram_for_BChl( frequency_list, Huang_Rhys_factor, scaling_factor_estimate):
+def plot_E_scaling_factor_phase_diagram_for_BChl_dimer(frequency_list, Huang_Rhys_factor, scaling_factor_estimate):
     '''
 
     :return:
     '''
     matplotlib.rcParams.update({'font.size': 20})
 
-    # for exciton energy transfer, we need to multiply it by sqrt(2)
-    Huang_Rhys_factor = Huang_Rhys_factor * np.sqrt(2)
-
     EV_coupling_alpha = np.sqrt(Huang_Rhys_factor)
 
-    T_prime_prefactor = estimate_T_prime_prefactor_subroutine(EV_coupling_alpha, frequency_list)
+    T_prime_prefactor = estimate_T_prime_prefactor_subroutine_dimer(EV_coupling_alpha, frequency_list)
 
     scaling_num = 20
     scaling_factor_list = np.linspace(0.08 , 0.3, scaling_num)
@@ -105,7 +104,7 @@ def plot_E_scaling_factor_phase_diagram_for_BChl( frequency_list, Huang_Rhys_fac
         transition_energy_list_no_Vt[i] = transition_energy_no_Vt
 
     # find transition energy when we turn Vt on
-    Vt = 353
+    Vt = 363
     T_prime = Vt * T_prime_prefactor
     transition_energy_list_with_Vt = np.zeros([scaling_num])
 
@@ -152,7 +151,7 @@ def plot_E_scaling_factor_phase_diagram_for_full_mode_BChl():
     geometric_mean_freq = np.prod(np.power(frequency_list , 1/dof))
     scaling_factor_estimate = 1/270 * np.sqrt( geometric_mean_freq )
 
-    plot_E_scaling_factor_phase_diagram_for_BChl(frequency_list, Huang_Rhys_factor , scaling_factor_estimate)
+    plot_E_scaling_factor_phase_diagram_for_BChl_dimer(frequency_list, Huang_Rhys_factor, scaling_factor_estimate)
 
 def plot_E_scaling_factor_phase_diagram_for_12_mode_BChl():
     '''
@@ -170,6 +169,5 @@ def plot_E_scaling_factor_phase_diagram_for_12_mode_BChl():
     scaling_factor_estimate = np.prod( np.power(scaling_factor_list, 1/dof) ) # geometric mean
 
 
-    plot_E_scaling_factor_phase_diagram_for_BChl(frequency_list, Huang_Rhys_factor, scaling_factor_estimate)
-
+    plot_E_scaling_factor_phase_diagram_for_BChl_dimer(frequency_list, Huang_Rhys_factor, scaling_factor_estimate)
 

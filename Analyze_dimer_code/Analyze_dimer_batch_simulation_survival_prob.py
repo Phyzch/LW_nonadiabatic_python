@@ -1,6 +1,6 @@
 from matplotlib import pyplot, gridspec
 from util import *
-from Analyze_dimer_code.Analyze_dimer_batch_siimulation_auxiliary_func import *
+from Analyze_dimer_code.Analyze_dimer_batch_siimulation_survival_prob_auxiliary_func import *
 
 
 def plot_dimer_survival_prob_selected_states_batch_simulation():
@@ -35,7 +35,7 @@ def analyze_dilution_factor_and_T_T_prime_phase_diagram():
     V0 = 300
     scaling_factor = 0.3
 
-    save_bool = False
+    save_bool = True
     folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/BChl_dimer_model/5_mode/batch_simulation/output_file/"
 
     file_path1 = "Vt=0"
@@ -53,12 +53,31 @@ def analyze_dilution_factor_and_T_T_prime_phase_diagram():
     file_path5_1 = "Vt=363_low_energy"
     file_path6_1 = "Vt=500_low_energy"
 
+    ## additioinal_results_for_states_with_middle_energy
+    file_path1_2 = "Vt=0_middle_energy"
+    file_path2_2 = "Vt=50_middle_energy"
+    file_path3_2 = "Vt=100_middle_energy"
+    file_path4_2 = "Vt=200_middle_energy"
+    file_path5_2 = "Vt=363_middle_energy"
+    file_path6_2 = "Vt=500_middle_energy"
+
+    ## additioinal_results_for_states_with_middle_energy
+    file_path1_3 = "Vt=0_high_energy"
+    file_path2_3 = "Vt=50_high_energy"
+    file_path3_3 = "Vt=100_high_energy"
+    file_path4_3 = "Vt=200_high_energy"
+    file_path5_3 = "Vt=363_high_energy"
+    file_path6_3 = "Vt=500_high_energy"
+
     file_path_list = [file_path1, file_path2, file_path3, file_path4, file_path5, file_path6,
-                      file_path1_1, file_path2_1, file_path3_1, file_path4_1, file_path5_1, file_path6_1]
+                      file_path1_1, file_path2_1, file_path3_1, file_path4_1, file_path5_1, file_path6_1,
+                      file_path1_2, file_path2_2, file_path3_2, file_path4_2, file_path5_2, file_path6_2,
+                      file_path1_3, file_path2_3, file_path3_3, file_path4_3, file_path5_3, file_path6_3]
 
     file_path_list = [os.path.join(folder_path, path) for path in file_path_list]
 
-    Vt_list = [0, 50, 100, 200, 363, 500, 0, 50, 100, 200, 363, 500]
+    Vt_list = [0, 50, 100, 200, 363, 500] * 4
+
     frequency_list_monomer1 = np.array([890, 727, 345, 1117, 1158])
     frequency_list_monomer2 = np.array([890, 727, 345, 1117, 1158])
 
@@ -127,10 +146,11 @@ def analyze_dilution_factor_and_T_T_prime_phase_diagram_subroutine(folder_path, 
     length = len(dilution_factor_list)
 
     localization_index_list = [index for index in range(length) if
-                               dilution_factor_list[index] > dilution_factor_criterion1]
-    mixing_index_list = [index for index in range(length) if
-                         dilution_factor_list[index] <= dilution_factor_criterion1 and dilution_factor_list[
-                             index] > dilution_factor_criterion2]
+                               dilution_factor_list[index] > dilution_factor_criterion2]
+
+    # mixing_index_list = [index for index in range(length) if
+    #                      dilution_factor_list[index] <= dilution_factor_criterion1 and dilution_factor_list[
+    #                          index] > dilution_factor_criterion2]
 
     extended_state_index_list = [index for index in range(length) if
                                  dilution_factor_list[index] <= dilution_factor_criterion2]
@@ -140,8 +160,8 @@ def analyze_dilution_factor_and_T_T_prime_phase_diagram_subroutine(folder_path, 
     ax = fig.add_subplot(spec[0,0])
 
     ax.scatter(T_list[localization_index_list] , T_prime_list[localization_index_list] , marker = 'o' , color = 'red' , s=40)
-    ax.scatter(T_list[extended_state_index_list] , T_prime_list[extended_state_index_list] , marker =  'v', color = 'blue', s=40)
-    ax.scatter(T_list[mixing_index_list], T_prime_list[mixing_index_list], marker = 's' , color = 'purple', s = 40 )
+    ax.scatter(T_list[extended_state_index_list] , T_prime_list[extended_state_index_list] , marker =  'v', color = 'black', s=40)
+    # ax.scatter(T_list[mixing_index_list], T_prime_list[mixing_index_list], marker = 's' , color = 'purple', s = 40 )
 
     T_boundary = np.linspace(0,1, 100)
     T_prime_boundary = 1 - T_boundary
@@ -150,7 +170,7 @@ def analyze_dilution_factor_and_T_T_prime_phase_diagram_subroutine(folder_path, 
     ax.set_xlabel("$T$")
     ax.set_ylabel(" $T'$ ")
     ax.set_ylim([-0.05, 0.6 ])
-    ax.set_xlim([0,1])
+    ax.set_xlim([0, 1.0])
 
     if save_bool:
         fig_name = "dilution factor vs T.svg"
@@ -158,3 +178,62 @@ def analyze_dilution_factor_and_T_T_prime_phase_diagram_subroutine(folder_path, 
         fig.savefig(fig_name)
 
     plt.show()
+
+def analyze_dilution_factor_with_anharmonic_T_dimer():
+    '''
+
+    :return:
+    '''
+    V0 = 300
+    scaling_factor = 0.3
+
+    save_bool = True
+    folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/BChl_dimer_model/5_mode/batch_simulation/output_file/"
+
+    file_path1 = "Vt=0"
+    file_path2 = "Vt=0_low_energy"
+    file_path3 = "Vt=0_middle_energy"
+
+    file_path_list = [file_path1, file_path2, file_path3]
+    file_path_list = [os.path.join(folder_path, path) for path in file_path_list]
+
+    T_list = []
+    dilution_factor_list = []
+    file_num = len(file_path_list)
+
+    for i in range(file_num):
+        file_path = file_path_list[i]
+        state_num, nmode, state_energy, monomer1_quantum_num, monomer2_quantum_num, dilution_factor, time_list = compute_dimer_state_dilution_factor(
+            file_path)
+
+        dilution_factor = dilution_factor.tolist()
+
+        # transition factor in same PES
+        T = estimate_transition_factor_T_dimer_lists(V0, scaling_factor, file_path)
+        T = T.tolist()
+
+        T_list = T_list + T
+        dilution_factor_list = dilution_factor_list + dilution_factor
+
+    T_list = np.array(T_list)
+    dilution_factor_list = np.array(dilution_factor_list)
+
+    fig = plt.figure(figsize=(10, 10))
+    spec = gridspec.GridSpec(nrows=1, ncols=1, figure=fig)
+    ax = fig.add_subplot(spec[0, 0])
+
+    ax.scatter(T_list, dilution_factor_list,  marker = 'o' , s=40 )
+
+    ax.set_xlabel('T')
+    ax.set_ylabel('$\sigma$')
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+
+    ax.set_xlim([ np.min(T_list) - 0.01 , 1 ])
+
+    plt.show()
+
+    if save_bool:
+        fig_name = "anharmonic T vs dilution factor.svg"
+        fig_name = os.path.join(folder_path, fig_name)
+        fig.savefig(fig_name)

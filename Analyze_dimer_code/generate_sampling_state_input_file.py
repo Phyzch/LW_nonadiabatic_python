@@ -11,12 +11,12 @@ def generate_sampling_state_info_file():
     file_name = "sampling_state_info.txt"
     file_path = os.path.join(folder_path, file_name)
 
-    sampling_state_num = 10
+    sampling_state_num = 20
     monomer_mode_num = 5
 
     nmax_sampling_list = np.array([ 3, 3, 3, 3 , 3 ])
-    upper_energy_cutoff = 5000
-    lower_energy_cutoff = 3000
+    upper_energy_cutoff = 10000
+    lower_energy_cutoff = 8000
 
     frequency_list = np.array([890, 727, 345, 1117, 1158])
 

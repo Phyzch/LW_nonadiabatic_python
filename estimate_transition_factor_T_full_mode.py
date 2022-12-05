@@ -25,9 +25,11 @@ def estimate_transition_factor_subroutine(Q, V0, scaling_factor,  frequency_list
 
     return Tq
 
-def estimate_transition_factor_with_freq_and_energy(energy, frequency_list, scaling_factor):
+def estimate_transition_factor_with_freq_and_energy_dimer(energy, frequency_list, scaling_factor):
     '''
     choose formula for coupling Vq using Bigwood , Leitner, Gruebele, Wolynes 1998
+        # here we assume equal energy in each monomer.
+
     :return:
     '''
     dof = len(frequency_list)
@@ -41,17 +43,22 @@ def estimate_transition_factor_with_freq_and_energy(energy, frequency_list, scal
     # V3 = 2
     # V0 = V3 / np.power(scaling_factor ,3)
 
+    #  here we assume equal energy in each monomer.
+    monomer_energy = energy / 2
+
     # cubic order
     Q = 3
-    Tq3 = estimate_transition_factor_subroutine(Q, V0, scaling_factor, frequency_list, energy)
+    Tq3 = estimate_transition_factor_subroutine(Q, V0, scaling_factor, frequency_list, monomer_energy )
 
     # quartic coupling
     Q = 4
-    Tq4 = estimate_transition_factor_subroutine(Q, V0, scaling_factor, frequency_list, energy)
+    Tq4 = estimate_transition_factor_subroutine(Q, V0, scaling_factor, frequency_list, monomer_energy )
 
     Tq = Tq3 + Tq4
 
-    return Tq
+    dimer_Tq = Tq * 2
+
+    return dimer_Tq
 
 def estimate_transition_energy(energy, frequency_list , T_prime, scaling_factor):
     '''
@@ -60,11 +67,11 @@ def estimate_transition_energy(energy, frequency_list , T_prime, scaling_factor)
     :param frequency_list:
     :return:
     '''
-    Tq = estimate_transition_factor_with_freq_and_energy(energy, frequency_list, scaling_factor)
+    Tq = estimate_transition_factor_with_freq_and_energy_dimer(energy, frequency_list, scaling_factor)
 
     return Tq + T_prime - 1
 
-def estimate_transition_factor_full_mode():
+def estimate_transition_factor_full_mode_dimer():
     '''
 
     :return:
@@ -85,9 +92,14 @@ def estimate_transition_factor_full_mode():
     energy_list = np.linspace(0,2000, data_num)
     Tq_list = np.zeros([data_num])
 
+    # here we assume equal energy in each monomer.
+
     for i in range(data_num):
         energy = energy_list[i]
-        Tq = estimate_transition_factor_with_freq_and_energy( energy ,frequency_list, scaling_factor)
+
+        Tq = estimate_transition_factor_with_freq_and_energy_dimer(energy, frequency_list, scaling_factor)
+
+
         Tq_list[i] = Tq
 
     fig = plt.figure(figsize=(10, 10))
@@ -119,7 +131,7 @@ def estimate_transition_factor_12_most_strongly_coupled_mode():
 
     for i in range(data_num):
         energy = energy_list[i]
-        Tq = estimate_transition_factor_with_freq_and_energy(energy, frequency_list, scaling_factor)
+        Tq = estimate_transition_factor_with_freq_and_energy_dimer(energy, frequency_list, scaling_factor)
         Tq_list[i] = Tq
 
     fig = plt.figure(figsize=(10, 10))
@@ -130,5 +142,3 @@ def estimate_transition_factor_12_most_strongly_coupled_mode():
     ax.set_xlabel('E')
     ax.set_ylabel('T')
     plt.show()
-
-# estimate_transition_factor_12_most_strongly_coupled_mode()
