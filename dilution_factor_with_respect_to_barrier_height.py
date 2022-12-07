@@ -1,14 +1,12 @@
 from util import *
 from Analyze_survival_prob import compute_dilution_factor
 
-def compute_barrier_height(ground_state_energy_shift , EV_coupling_alpha):
+def compute_barrier_height(ground_state_energy_shift , frequency_list, EV_coupling_alpha):
     '''
     # ground state energy for electronic state |1> compared to electronic state 0.
     # electron vibration coupling factor: EV_coupling_alpha =
     :return:
     '''
-    frequency_list = np.array( [890, 727, 345, 1117, 1158] )
-
     # ci : coupling strength
     EV_coupling = EV_coupling_alpha * np.power(frequency_list , 3/2) * np.sqrt(2)
 
@@ -46,7 +44,8 @@ def plot_dilution_factor_vs_energy_dE_600():
 
     ground_state_energy_shift = 600
     EV_coupling_alpha = np.array([0.169, 0.163, 0.127, 0.101, 0.101])
-    energy_barrier_height = compute_barrier_height(ground_state_energy_shift, EV_coupling_alpha)
+    frequency_list = np.array( [890, 727, 345, 1117, 1158] )
+    energy_barrier_height = compute_barrier_height(ground_state_energy_shift, frequency_list, EV_coupling_alpha)
 
     parent_folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/Bchl 5mode/batch_simulation_phase_diagram/"
 
@@ -161,7 +160,9 @@ def plot_dilution_factor_vs_energy_strong_EV_coupling():
 
     ground_state_energy_shift = 600
     EV_coupling_alpha = np.array([0.4,0.4,0.4,0.4,0.4])
-    energy_barrier_height = compute_barrier_height(ground_state_energy_shift , EV_coupling_alpha)
+    frequency_list = np.array( [890, 727, 345, 1117, 1158] )
+
+    energy_barrier_height = compute_barrier_height(ground_state_energy_shift , frequency_list, EV_coupling_alpha)
 
     parent_folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/Bchl 5mode/strong EV coupling model/large_qn_space/"
 
@@ -272,7 +273,9 @@ def plot_dilution_factor_vs_energy_dE_0_correct_EV():
 
     ground_state_energy_shift = 0
     EV_coupling_alpha = np.array([0.239, 0.231, 0.180, 0.143, 0.143])
-    energy_barrier_height = compute_barrier_height(ground_state_energy_shift, EV_coupling_alpha)
+    frequency_list = np.array( [890, 727, 345, 1117, 1158] )
+
+    energy_barrier_height = compute_barrier_height(ground_state_energy_shift, frequency_list, EV_coupling_alpha)
 
     parent_folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/Bchl 5mode/batch_simulation_phase_diagram_correct_EV"
 

@@ -4,7 +4,7 @@ estimate nonadiabatic transition factor T' for 50 modes BChl. as function of Vt
 from util import *
 from scipy.optimize import root
 from Overlap_of_displaced_state import effective_num_coupling_submodule
-from estimate_transition_factor_T_full_mode import  estimate_transition_energy
+from estimate_transition_factor_T_full_mode import  estimate_transition_energy,estimate_transition_factor_with_freq_and_energy_dimer
 
 def estimate_T_prime_prefactor_subroutine_dimer(EV_coupling_alpha_list, frequency_list):
     '''
@@ -79,7 +79,7 @@ def estimate_T_prime_prefactor_12_modes_largest_EV_dimer():
 
 
 
-def plot_E_scaling_factor_phase_diagram_for_BChl_dimer(frequency_list, Huang_Rhys_factor, scaling_factor_estimate):
+def plot_E_scaling_factor_phase_diagram_for_BChl_dimer(frequency_list, Huang_Rhys_factor, scaling_factor_estimate, folder_path, save_bool):
     '''
 
     :return:
@@ -106,6 +106,8 @@ def plot_E_scaling_factor_phase_diagram_for_BChl_dimer(frequency_list, Huang_Rhy
     # find transition energy when we turn Vt on
     Vt = 363
     T_prime = Vt * T_prime_prefactor
+    print("T_prime  " + str(T_prime) + " for Vt: " + str(Vt))
+
     transition_energy_list_with_Vt = np.zeros([scaling_num])
 
     for i in range(scaling_num):
@@ -128,6 +130,12 @@ def plot_E_scaling_factor_phase_diagram_for_BChl_dimer(frequency_list, Huang_Rhy
     ax.set_xlabel('1/$a$')
     ax.set_ylabel('Energy ($cm^{-1}$)')
 
+    if save_bool:
+        file_name = "transition_energy_E_vs_scaling_factor_dimer.svg"
+        file_name = os.path.join(folder_path,file_name)
+        fig.savefig(file_name)
+
+
     plt.show()
 
 
@@ -136,6 +144,8 @@ def plot_E_scaling_factor_phase_diagram_for_full_mode_BChl():
 
     :return:
     '''
+    save_bool = False
+    folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/result 2022.10.06/paper fig/full_mode_T_T'_estimate/dimer_case/"
     frequency_list = np.array([  84,  167,  183,  191,  214,  239,  256,  345,  368,  388,  407,
         423,  442,  473,  506,  565,  587,  623,  684,  696,  710,  727,
         776,  803,  845,  858,  890,  915,  967,  980, 1001, 1019, 1066,
@@ -151,13 +161,15 @@ def plot_E_scaling_factor_phase_diagram_for_full_mode_BChl():
     geometric_mean_freq = np.prod(np.power(frequency_list , 1/dof))
     scaling_factor_estimate = 1/270 * np.sqrt( geometric_mean_freq )
 
-    plot_E_scaling_factor_phase_diagram_for_BChl_dimer(frequency_list, Huang_Rhys_factor, scaling_factor_estimate)
+    plot_E_scaling_factor_phase_diagram_for_BChl_dimer(frequency_list, Huang_Rhys_factor, scaling_factor_estimate, folder_path, save_bool)
 
 def plot_E_scaling_factor_phase_diagram_for_12_mode_BChl():
     '''
 
     :return:
     '''
+    save_bool = False
+    folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/result 2022.10.06/paper fig/full_mode_T_T'_estimate/dimer_case/"
     frequency_list = np.array([ 187, 335, 566, 730, 760, 895, 1020, 1115, 1131, 1162, 1281, 1376 ])
 
     # data source : Table II , III of J. Chem. Phys. 134, 024506 (2011)
@@ -169,5 +181,74 @@ def plot_E_scaling_factor_phase_diagram_for_12_mode_BChl():
     scaling_factor_estimate = np.prod( np.power(scaling_factor_list, 1/dof) ) # geometric mean
 
 
-    plot_E_scaling_factor_phase_diagram_for_BChl_dimer(frequency_list, Huang_Rhys_factor, scaling_factor_estimate)
+    plot_E_scaling_factor_phase_diagram_for_BChl_dimer(frequency_list, Huang_Rhys_factor, scaling_factor_estimate, folder_path, save_bool)
 
+
+def plot_E_transition_factor_subroutine(scaling_factor, Vt, Huang_Rhys_factor, frequency_list, fig_path, save_bool):
+    '''
+
+    :param V0: 3050 according to fitting.
+    :param scaling_factor: scaling factor in Bigwood 1998 paper
+    :param Vt:  nonadiabatic coupling strength
+    :param Huang_Rhys_factor: EV coupling strength
+    :return:
+    '''
+    matplotlib.rcParams.update({'font.size': 20})
+
+    data_num = 20
+    energy_list = np.linspace(0, 20000, data_num)
+    Tq_list = np.zeros([data_num])
+
+    EV_coupling_alpha = np.sqrt(Huang_Rhys_factor)
+    T_prime_prefactor = estimate_T_prime_prefactor_subroutine_dimer(EV_coupling_alpha, frequency_list)
+    T_prime = Vt * T_prime_prefactor
+
+    for i in range(data_num):
+        energy = energy_list[i]
+        Tq = estimate_transition_factor_with_freq_and_energy_dimer(energy, frequency_list, scaling_factor)
+        Tq_list[i] = Tq
+
+    Tq_T_prime_sum_list = Tq_list + T_prime
+
+    fig = plt.figure(figsize=(10, 10))
+    spec = gridspec.GridSpec(nrows=1, ncols=1, figure=fig)
+    ax = fig.add_subplot(spec[0, 0])
+    ax.plot(energy_list, Tq_list, marker='o', linewidth=2)
+    ax.plot(energy_list, Tq_T_prime_sum_list, marker = 's' , linewidth = 2)
+
+    ax.set_xticks([0,5000, 10000, 15000, 20000])
+
+    ax.set_xlabel('E')
+    ax.set_ylabel("T or (T + T')")
+
+    if save_bool:
+        fig_name = "transition factor T, T' vs energy.svg"
+        fig_name = os.path.join(fig_path, fig_name)
+        fig.savefig(fig_name)
+
+    plt.show()
+
+
+def plot_E_transition_factor_for_5_mode_BChl():
+    '''
+
+    :return:
+    '''
+    save_bool = False
+    folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/result 2022.10.06/paper fig/full_mode_T_T'_estimate/dimer_case/"
+    frequency_list = np.array([ 890, 727, 345, 1117, 1158 ])
+
+    # data source : Table II , III of J. Chem. Phys. 134, 024506 (2011)
+    Huang_Rhys_factor = 1/1000 *  np.array([28, 26.6, 16.1, 10.3, 10.3])
+
+    # manually input scaling factor list, estimate from mode type. for 12 mode model.
+    scaling_factor_list = np.array([0.110, 0.100, 0.069, 0.124, 0.126])
+    dof = len(scaling_factor_list)
+    scaling_factor_estimate = np.prod( np.power(scaling_factor_list, 1/dof) ) # geometric mean
+
+    V0 = 3050
+    Vt = 363
+
+    fig_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/result 2022.10.06/paper fig/full_mode_T_T'_estimate/5 mode estimate/"
+    save_bool = False
+    plot_E_transition_factor_subroutine(scaling_factor_estimate, Vt, Huang_Rhys_factor, frequency_list, fig_path, save_bool)

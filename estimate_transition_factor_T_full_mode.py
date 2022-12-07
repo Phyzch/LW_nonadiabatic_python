@@ -32,10 +32,8 @@ def estimate_transition_factor_with_freq_and_energy_dimer(energy, frequency_list
 
     :return:
     '''
-    dof = len(frequency_list)
-
     # scaling factor: (use formula in 1998 PNAS Bigwood , Leitner, Gruebele, Wolynes)
-    geometric_mean_freq = np.prod(np.power(frequency_list , 1/dof))
+    # geometric_mean_freq = np.prod(np.power(frequency_list , 1/dof))
     # scaling_factor = 1/270 * np.sqrt( geometric_mean_freq )
 
     V0 = 3050
@@ -77,6 +75,8 @@ def estimate_transition_factor_full_mode_dimer():
     :return:
     '''
     matplotlib.rcParams.update({'font.size': 20})
+    save_bool = False
+
     frequency_list = np.array([  84,  167,  183,  191,  214,  239,  256,  345,  368,  388,  407,
         423,  442,  473,  506,  565,  587,  623,  684,  696,  710,  727,
         776,  803,  845,  858,  890,  915,  967,  980, 1001, 1019, 1066,
@@ -99,7 +99,6 @@ def estimate_transition_factor_full_mode_dimer():
 
         Tq = estimate_transition_factor_with_freq_and_energy_dimer(energy, frequency_list, scaling_factor)
 
-
         Tq_list[i] = Tq
 
     fig = plt.figure(figsize=(10, 10))
@@ -109,6 +108,13 @@ def estimate_transition_factor_full_mode_dimer():
 
     ax.set_xlabel('E')
     ax.set_ylabel('T')
+
+    folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/result 2022.10.06/paper fig/full_mode_T_T'_estimate/dimer_case/"
+    if save_bool:
+        file_name = "dimer_T_E_relation_assume_monomer_equal_energy.svg"
+        file_name = os.path.join(folder_path, file_name)
+        fig.savefig(file_name)
+
     plt.show()
 
 def estimate_transition_factor_12_most_strongly_coupled_mode():
@@ -135,6 +141,38 @@ def estimate_transition_factor_12_most_strongly_coupled_mode():
         Tq_list[i] = Tq
 
     fig = plt.figure(figsize=(10, 10))
+    spec = gridspec.GridSpec(nrows=1, ncols=1, figure=fig)
+    ax = fig.add_subplot(spec[0, 0])
+    ax.plot(energy_list, Tq_list, marker='o', linewidth=2)
+
+    ax.set_xlabel('E')
+    ax.set_ylabel('T')
+    plt.show()
+
+def estimate_transition_factor_5_most_strongly_coupled_mode():
+    '''
+
+    :return:
+    '''
+    matplotlib.rcParams.update({'font.size': 20})
+
+    frequency_list = np.array([890, 727, 345, 1117, 1158])
+
+    scaling_factor_list = np.array([0.110, 0.100, 0.069, 0.124, 0.126 ])
+    dof = len(scaling_factor_list)
+
+    scaling_factor = np.prod( np.power(scaling_factor_list, 1/dof) ) # geometric mean
+
+    data_num = 20
+    energy_list = np.linspace(0, 20000, data_num)
+    Tq_list = np.zeros([data_num])
+
+    for i in range(data_num):
+        energy = energy_list[i]
+        Tq = estimate_transition_factor_with_freq_and_energy_dimer(energy, frequency_list, scaling_factor)
+        Tq_list[i] = Tq
+
+    fig = plt.figure(figsize=(15, 10))
     spec = gridspec.GridSpec(nrows=1, ncols=1, figure=fig)
     ax = fig.add_subplot(spec[0, 0])
     ax.plot(energy_list, Tq_list, marker='o', linewidth=2)
