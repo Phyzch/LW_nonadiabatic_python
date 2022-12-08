@@ -6,7 +6,7 @@ from scipy.optimize import root
 from Overlap_of_displaced_state import effective_num_coupling_submodule
 from estimate_transition_factor_T_full_mode import  estimate_transition_energy,estimate_transition_factor_with_freq_and_energy_dimer
 
-def estimate_T_prime_prefactor_subroutine_dimer(EV_coupling_alpha_list, frequency_list):
+def estimate_T_prime_prefactor_subroutine_dimer(EV_coupling_alpha_list, frequency_list, energy = 0):
     '''
      T_prime = Vt * prefactor.
      Here pre_factor is computed here.
@@ -20,8 +20,11 @@ def estimate_T_prime_prefactor_subroutine_dimer(EV_coupling_alpha_list, frequenc
 
     # compute Kt: connectivity
     dof = len(frequency_list)
-    # at low energy, we focus on Ki for quantum number n = 0
-    qn = 0
+
+    # at very low energy, we focus on Ki for quantum number n = 0.
+    # energy is energy for dimer.
+    qn = round( (energy/2) / (dof * omega_rms) )
+
     Ki_list = np.zeros([dof])
     for i in range(dof):
         alpha = EV_coupling_alpha_list[i]
@@ -56,9 +59,9 @@ def estimate_T_prime_prefactor_full_mode_dimer():
 
     EV_coupling_alpha = np.sqrt(Huang_Rhys_factor)
 
-    T_prime_prefactor = estimate_T_prime_prefactor_subroutine_dimer(EV_coupling_alpha, frequency_list)
+    T_prime_prefactor_ground_state = estimate_T_prime_prefactor_subroutine_dimer(EV_coupling_alpha, frequency_list)
 
-    return T_prime_prefactor
+    return T_prime_prefactor_ground_state
 
 
 def estimate_T_prime_prefactor_12_modes_largest_EV_dimer():
@@ -73,9 +76,10 @@ def estimate_T_prime_prefactor_12_modes_largest_EV_dimer():
 
     EV_coupling_alpha = np.sqrt(Huang_Rhys_factor)
 
-    T_prime_prefactor = estimate_T_prime_prefactor_subroutine_dimer(EV_coupling_alpha, frequency_list)
+    # assume energy E = 0.
+    T_prime_prefactor_ground_state = estimate_T_prime_prefactor_subroutine_dimer(EV_coupling_alpha, frequency_list)
 
-    return T_prime_prefactor
+    return T_prime_prefactor_ground_state
 
 
 
@@ -196,30 +200,33 @@ def plot_E_transition_factor_subroutine(scaling_factor, Vt, Huang_Rhys_factor, f
     matplotlib.rcParams.update({'font.size': 20})
 
     data_num = 20
-    energy_list = np.linspace(0, 20000, data_num)
+    energy_list = np.linspace(0, 3000, data_num)
     Tq_list = np.zeros([data_num])
+    T_prime_list =  np.zeros([data_num])
 
     EV_coupling_alpha = np.sqrt(Huang_Rhys_factor)
-    T_prime_prefactor = estimate_T_prime_prefactor_subroutine_dimer(EV_coupling_alpha, frequency_list)
-    T_prime = Vt * T_prime_prefactor
+
 
     for i in range(data_num):
         energy = energy_list[i]
         Tq = estimate_transition_factor_with_freq_and_energy_dimer(energy, frequency_list, scaling_factor)
         Tq_list[i] = Tq
 
-    Tq_T_prime_sum_list = Tq_list + T_prime
+        T_prime_prefactor = estimate_T_prime_prefactor_subroutine_dimer(EV_coupling_alpha, frequency_list, energy)
+        T_prime = Vt * T_prime_prefactor
+        T_prime_list[i] = T_prime
+
+    Tq_T_prime_sum_list = Tq_list + T_prime_list
 
     fig = plt.figure(figsize=(10, 10))
     spec = gridspec.GridSpec(nrows=1, ncols=1, figure=fig)
     ax = fig.add_subplot(spec[0, 0])
-    ax.plot(energy_list, Tq_list, marker='o', linewidth=2)
-    ax.plot(energy_list, Tq_T_prime_sum_list, marker = 's' , linewidth = 2)
-
-    ax.set_xticks([0,5000, 10000, 15000, 20000])
+    ax.plot(energy_list, Tq_list, linewidth=4)
+    ax.plot(energy_list, Tq_T_prime_sum_list , linewidth = 4)
 
     ax.set_xlabel('E')
     ax.set_ylabel("T or (T + T')")
+    # ax.axhline(y=1 , linewidth = 3, color = 'black')
 
     if save_bool:
         fig_name = "transition factor T, T' vs energy.svg"
@@ -234,8 +241,6 @@ def plot_E_transition_factor_for_5_mode_BChl():
 
     :return:
     '''
-    save_bool = False
-    folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/result 2022.10.06/paper fig/full_mode_T_T'_estimate/dimer_case/"
     frequency_list = np.array([ 890, 727, 345, 1117, 1158 ])
 
     # data source : Table II , III of J. Chem. Phys. 134, 024506 (2011)
@@ -252,3 +257,31 @@ def plot_E_transition_factor_for_5_mode_BChl():
     fig_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/result 2022.10.06/paper fig/full_mode_T_T'_estimate/5 mode estimate/"
     save_bool = False
     plot_E_transition_factor_subroutine(scaling_factor_estimate, Vt, Huang_Rhys_factor, frequency_list, fig_path, save_bool)
+
+def plot_E_transition_factor_for_full_mode_BChl():
+    '''
+
+    :return:
+    '''
+    save_bool = False
+    fig_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/result 2022.10.06/paper fig/full_mode_T_T'_estimate/dimer_case_Bigwood formula/"
+    frequency_list = np.array([  84,  167,  183,  191,  214,  239,  256,  345,  368,  388,  407,
+        423,  442,  473,  506,  565,  587,  623,  684,  696,  710,  727,
+        776,  803,  845,  858,  890,  915,  967,  980, 1001, 1019, 1066,
+       1089, 1105, 1117, 1137, 1158, 1180, 1190, 1211, 1229, 1252, 1289,
+       1378, 1466, 1519, 1539, 1648, 1680])
+
+    # data source : Table II of J. Chem. Phys. 134, 024506 (2011)
+    Huang_Rhys_factor = 1/1000 * np.array([15.1, 8.1, 7.2, 19.6, 4.6, 7.8, 5.5, 16.1, 6.0, 4.1, 5.2, 2.9, 2.3, 1.7,
+                                           1.6, 8.1, 3.9, 5.8, 2.3, 2.5, 1.8, 26.6, 9.5, 4.2, 2.5, 2.5,
+                                           28.4, 4.8, 2.7, 3.1, 4.0, 9.7, 2.5, 2.1, 2.1, 10.3, 4.2,
+                                           10.3, 2.5, 3.1, 2.5, 2.1, 2.5, 8.7, 8.6, 2.1, 1.7, 2.3, 2.5, 2.7])
+    dof = len(frequency_list)
+    geometric_mean_freq = np.prod(np.power(frequency_list , 1/dof))
+    scaling_factor_estimate = 1/270 * np.sqrt( geometric_mean_freq )
+
+    Vt = 363
+
+    plot_E_transition_factor_subroutine(scaling_factor_estimate, Vt, Huang_Rhys_factor, frequency_list, fig_path, save_bool)
+
+# plot_E_transition_factor_for_full_mode_BChl()

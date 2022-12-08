@@ -3,6 +3,7 @@ from util import *
 from Analyze_dimer_code.Analyze_dimer_batch_siimulation_survival_prob_auxiliary_func import \
     compute_dimer_state_dilution_factor
 from dilution_factor_with_respect_to_barrier_height import compute_barrier_height
+from Analyze_dimer_code.Analyze_dimer_batch_siimulation_survival_prob_auxiliary_func import *
 
 
 def analyze_dilution_factor_vs_energy_main():
@@ -11,8 +12,36 @@ def analyze_dilution_factor_vs_energy_main():
     :return:
     '''
     # V0 = 300, a = 0.3
-    analyze_dilution_factor_vs_energy_V0_300()
+    # analyze_dilution_factor_vs_energy_V0_300()
 
+    # V0 = 3050, a = geometric mean , Bigwood formula
+    analyze_dilution_factor_vs_energy_V0_3050()
+
+def analyze_dilution_factor_vs_energy_V0_3050():
+    '''
+
+    :return:
+    '''
+    save_bool = True
+    parent_folder = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/BChl_dimer_model/" \
+                    "5_mode/batch_simulation_Bigwood_scaling/batch_simulation_output/"
+
+    folder_path_no_coupling = "Vt=0"
+    folder_path_no_coupling_list  = [folder_path_no_coupling]
+    folder_path_no_coupling_list = [os.path.join(parent_folder, path) for path in folder_path_no_coupling_list]
+
+    folder_path_with_Vt = "Vt=363"
+    folder_path_with_Vt_list = [folder_path_with_Vt]
+    folder_path_with_Vt_list = [os.path.join(parent_folder, path) for path in folder_path_with_Vt_list]
+
+    Vt_list = [0, 363]
+
+    # transition energy predicted by T=1
+    transition_energy_T = 15800
+    transition_energy_T_T_prime = 12400
+
+    analyze_dilution_factor_vs_energy_subroutine(folder_path_no_coupling_list, folder_path_with_Vt_list, Vt_list,save_bool,
+                                                 parent_folder, transition_energy_T,  transition_energy_T_T_prime)
 
 def analyze_dilution_factor_vs_energy_V0_300():
     '''
@@ -20,12 +49,6 @@ def analyze_dilution_factor_vs_energy_V0_300():
     :return:
     '''
     save_bool = False
-
-    ground_state_energy_shift = 0
-    frequency_list = np.array([890, 727, 345, 1117, 1158, 890, 727, 345, 1117, 1158])
-    alpha_list = np.array([0.169, 0.163, 0.127, 0.101, 0.101, 0.169, 0.163, 0.127, 0.101, 0.101])
-
-    barrier_height = compute_barrier_height(ground_state_energy_shift, frequency_list, alpha_list)
 
     parent_folder = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/BChl_dimer_model/5_mode/batch_simulation/output_file/"
 
@@ -48,11 +71,12 @@ def analyze_dilution_factor_vs_energy_V0_300():
 
     Vt_list = [0, 363]
 
-    analyze_dilution_factor_vs_energy_subroutine(folder_path_no_coupling_list, folder_path_with_Vt_list, barrier_height,
+    analyze_dilution_factor_vs_energy_subroutine(folder_path_no_coupling_list, folder_path_with_Vt_list,
                                                  Vt_list, save_bool, parent_folder)
 
 
-def analyze_dilution_factor_vs_energy_subroutine(folder_path_no_coupling_list, folder_path_with_Vt_list, barrier_height, Vt_list, save_bool, fig_folder):
+def analyze_dilution_factor_vs_energy_subroutine(folder_path_no_coupling_list, folder_path_with_Vt_list, Vt_list, save_bool, fig_folder, transition_energy_T,
+                                                 transition_energy_T_T_prime):
     '''
 
     :return:
@@ -104,7 +128,8 @@ def analyze_dilution_factor_vs_energy_subroutine(folder_path_no_coupling_list, f
 
     ax1.set_xlabel('E')
     ax1.set_ylabel('$\sigma$')
-    ax1.axvline(x = barrier_height, linewidth = 3)
+    ax1.axvline(x = transition_energy_T, linewidth = 3, color = 'black')
+    ax1.axvline(x = transition_energy_T_T_prime , linewidth = 3 , color = 'brown')
 
     dilution_factor_ratio = dilution_factor_with_Vt_list / dilution_factor_no_coupling_list
     ax2.scatter(state_energy_list, dilution_factor_ratio, color = 'black' )
@@ -113,7 +138,7 @@ def analyze_dilution_factor_vs_energy_subroutine(folder_path_no_coupling_list, f
     ax2.set_ylabel('$\sigma$($V_{t}=$' + str(Vt_list[1]) + ") / $\sigma$($V_{t}=0$)")
     ax2.legend(loc='best', prop={'size': 10})
     ax2.set_yscale('log')
-    ax2.axvline(x = barrier_height, linewidth = 3)
+    # ax2.axvline(x = barrier_height, linewidth = 3)
 
     plt.show()
 
@@ -121,3 +146,5 @@ def analyze_dilution_factor_vs_energy_subroutine(folder_path_no_coupling_list, f
         fig_name = "dilution factor vs energy.svg"
         fig_path = os.path.join(fig_folder, fig_name)
         fig.savefig(fig_path)
+
+

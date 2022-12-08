@@ -7,11 +7,17 @@ def plot_dimer_survival_prob_selected_states_batch_simulation():
     :param file_path:
     :return:
     '''
-    file_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/BChl_dimer_model/5_mode/batch_simulation_Bigwood_scaling/example/high_energy_extended_state_Vt=363_dE=700/"
+    save_bool = False
+    fig_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/BChl_dimer_model/5_mode/batch_simulation/test_anharmonic_effect/"
+
+    file_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/BChl_dimer_model/5_mode/batch_simulation/test_anharmonic_effect/V3=0"
     state_num, nmode, state_energy, monomer1_quantum_num, monomer2_quantum_num, survival_prob_list, time_list = Read_dimer_survival_prob_all_states(file_path)
 
-    file_path2 = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/BChl_dimer_model/5_mode/batch_simulation_Bigwood_scaling/example/high_energy_extended_state_Vt=363_dE=1000/"
+    file_path2 = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/BChl_dimer_model/5_mode/batch_simulation/test_anharmonic_effect/V3=100,a=0.25"
     state_num, nmode, state_energy2, monomer1_quantum_num2, monomer2_quantum_num2, survival_prob_list2, time_list2 = Read_dimer_survival_prob_all_states(file_path2)
+
+    file_path3 = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/BChl_dimer_model/5_mode/batch_simulation/test_anharmonic_effect/V3=300,a=0.25"
+    state_num, nmode, state_energy3, monomer1_quantum_num3, monomer2_quantum_num3, survival_prob_list3, time_list3 = Read_dimer_survival_prob_all_states(file_path3)
 
 
     fig = plt.figure(figsize=(10, 10))
@@ -19,13 +25,28 @@ def plot_dimer_survival_prob_selected_states_batch_simulation():
     ax = fig.add_subplot(spec[0, 0])
 
     selected_index = 0
-    label = "|v1> = " + str(monomer1_quantum_num[selected_index]) + " |v2> = " + str(monomer2_quantum_num[selected_index])
+    label = "|v1> = " + str(monomer1_quantum_num[selected_index]) + " |v2> = " + str(monomer2_quantum_num[selected_index]) + " a=0"
+    label2 = "|v1> = " + str(monomer1_quantum_num2[selected_index]) + " |v2> = " + str(
+        monomer2_quantum_num2[selected_index]) + " V3=100 a=0.25"
+    label3 = "|v1> = " + str(monomer1_quantum_num2[selected_index]) + " |v2> = " + str(
+        monomer2_quantum_num2[selected_index]) + " V3=300, a=0.25"
 
-    ax.plot( time_list, survival_prob_list[selected_index] , linewidth = 2, label = label )
-    ax.plot(time_list2, survival_prob_list2[selected_index], linewidth = 2, label = label)
+    final_time = 2
+    dt = time_list[1] - time_list[0]
+    final_time_index = int(final_time / dt)
+
+    ax.plot( time_list[:final_time_index], survival_prob_list[selected_index, : final_time_index] , linewidth = 2, label = label )
+    ax.plot(time_list2[:final_time_index], survival_prob_list2[selected_index, : final_time_index], linewidth = 2, label = label2)
+    ax.plot(time_list3[:final_time_index], survival_prob_list3[selected_index, : final_time_index], linewidth = 2, label = label3)
+
 
     ax.legend(loc = 'best')
     ax.set_yscale('log')
+
+    if save_bool:
+        fig_name = "survival prob compare.svg"
+        fig_path = os.path.join(fig_path, fig_name)
+        fig.savefig(fig_path)
 
     plt.show()
 
@@ -52,7 +73,7 @@ def analyze_dilution_factor_and_T_T_prime_phase_diagram_V0_3050():
     scaling_factor_list = np.sqrt(frequency_list) / 270
     scaling_factor = np.prod( np.power(scaling_factor_list , 1/dof) )
 
-    save_bool = False 
+    save_bool = False
     folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/BChl_dimer_model/5_mode/batch_simulation_Bigwood_scaling/batch_simulation_output/"
 
     file_path1 = "Vt=0"
@@ -61,11 +82,12 @@ def analyze_dilution_factor_and_T_T_prime_phase_diagram_V0_3050():
     file_path4 = "Vt=200"
     file_path5 = "Vt=363"
 
+
     file_path_list = [file_path1, file_path2, file_path3, file_path4, file_path5]
     file_path_list = [os.path.join(folder_path, path) for path in file_path_list]
 
     Vt_list = [0, 50, 100, 200, 363]
-    color_list = ['blue', 'orange', 'gray', 'brown', 'black' ]
+    color_list = ['blue', 'orange', 'gray', 'brown', 'black'  ]
 
     frequency_list_monomer1 = np.array([890, 727, 345, 1117, 1158])
     frequency_list_monomer2 = np.array([890, 727, 345, 1117, 1158])
@@ -78,15 +100,15 @@ def analyze_dilution_factor_and_T_T_prime_phase_diagram_V0_3050():
 
     label_list = ['Vt=0' , 'Vt=50', 'Vt=100', 'Vt=200', 'Vt=363']
 
-    # analyze_dilution_factor_and_T_T_prime_log_scale_plot(folder_path, file_path_list, Vt_list,
-    #                                                      V0, scaling_factor, dimer_alpha, dimer_frequency,
-    #                                                      save_bool, color_list, label_list)
+    analyze_dilution_factor_and_T_T_prime_log_scale_plot(folder_path, file_path_list, Vt_list,
+                                                         V0, scaling_factor, dimer_alpha, dimer_frequency,
+                                                         save_bool, color_list, label_list)
 
     # analyze_dilution_factor_and_T_T_prime_phase_diagram_subroutine(folder_path, file_path_list, Vt_list,
     #                                                                V0, scaling_factor, dimer_alpha, dimer_frequency, save_bool)
 
-    analyze_dilution_factor_and_E_Vt_prime_phase_diagram_subroutine(folder_path, file_path_list,
-                                                                    Vt_list, dimer_alpha, dimer_frequency, save_bool)
+    # analyze_dilution_factor_and_E_Vt_prime_phase_diagram_subroutine(folder_path, file_path_list,
+    #                                                                 Vt_list, dimer_alpha, dimer_frequency, save_bool)
 
 def analyze_dilution_factor_and_T_T_prime_phase_diagram_V0_300():
     '''
@@ -221,11 +243,34 @@ def analyze_dilution_factor_and_T_T_prime_log_scale_plot(folder_path, file_path_
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.legend(loc = 'best')
+    ax.set_xlim([0.1, np.max(T_T_prime_sum_list) + 0.5 ])
 
     if save_bool:
         fig_name = "dilution factor vs T+T' log scale.svg"
         fig_name = os.path.join(folder_path, fig_name)
         fig.savefig(fig_name)
+
+    # for each Vt plot figure
+
+    # for i in range(path_num):
+    #     figi = plt.figure(figsize=(10, 10))
+    #     speci = gridspec.GridSpec(nrows=1, ncols=1, figure=figi)
+    #     axi =  figi.add_subplot(speci[0,0])
+    #
+    #     axi.scatter(T_T_prime_sum_list[i], dilution_factor_list[i], marker='o', color=color_list[i], label=label_list[i],
+    #                s=30)
+    #     axi.set_xscale('log')
+    #     axi.set_yscale('log')
+    #     axi.set_xlabel(" T + T' ")
+    #     axi.set_ylabel('$\sigma$')
+    #     axi.legend(loc = 'best')
+    #     axi.set_xlim([0.1, np.max(T_T_prime_sum_list) + 0.5 ])
+    #     axi.set_ylim([ 5* pow(10,-5) , 1 ])
+    #
+    #     if save_bool:
+    #         fig_name = "dilution factor vs T+T' log scale" + str(i) +".svg"
+    #         fig_name = os.path.join(folder_path, fig_name)
+    #         figi.savefig(fig_name)
 
     plt.show()
 
@@ -309,7 +354,7 @@ def analyze_dilution_factor_and_T_T_prime_phase_diagram_subroutine(folder_path, 
     ax.set_xlabel("$T$")
     ax.set_ylabel(" $T'$ ")
     ax.set_ylim([-0.05, 0.7 ])
-    ax.set_xlim([0, 1.6 ])
+    ax.set_xlim([0, 3.8 ])
 
     if save_bool:
         fig_name = "dilution factor vs T.svg"

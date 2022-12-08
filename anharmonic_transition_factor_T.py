@@ -39,11 +39,11 @@ def estimate_anharmonic_transition_factor_T( V0, scaling_factor , state_qn):
     Q = 3
     T3 = estimate_anharmonic_transition_factor_T_order_Q(Q, V0, scaling_factor, state_qn)
 
-    # Q = 4
-    # T4 = estimate_anharmonic_transition_factor_T_order_Q(Q, V0, scaling_factor, state_qn)
+    Q = 4
+    T4 = estimate_anharmonic_transition_factor_T_order_Q(Q, V0, scaling_factor, state_qn)
 
     # for Q=4, estimation for K is problematic, therefore, we only take Q=3
-    T = T3
+    T = T3 + T4
 
     return T
 
