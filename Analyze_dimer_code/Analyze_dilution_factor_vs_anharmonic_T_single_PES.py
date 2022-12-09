@@ -27,7 +27,7 @@ def analyze_dilution_factor_with_anharmonic_T_V0_3050_dimer():
     scaling_factor_list = np.sqrt(frequency_list) / 270
     scaling_factor = np.prod( np.power(scaling_factor_list , 1/dof) )
 
-    save_bool = True
+    save_bool = False
     folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/BChl_dimer_model/5_mode/batch_simulation_Bigwood_scaling/batch_simulation_output/"
     file_path = "Vt=0"
     file_path_list = [file_path]

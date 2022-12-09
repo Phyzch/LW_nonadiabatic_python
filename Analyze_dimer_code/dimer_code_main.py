@@ -7,6 +7,8 @@ from Analyze_dimer_code.Analyze_dimer_dilution_factor_vs_energy import analyze_d
 from Analyze_dimer_code.Analyze_T_vs_energy import analyze_T_T_prime_vs_energy_main
 from Analyze_dimer_code.generate_sampling_state_input_file import generate_sampling_state_info_file
 
+from Analyze_dimer_code.Analyze_nonstatistical_states import analyze_nonstatistical_states
+
 def Analyze_dimer_code_main():
     '''
 
@@ -16,7 +18,7 @@ def Analyze_dimer_code_main():
 
     # plot_dimer_survival_prob_two_file()
 
-    plot_dimer_survival_prob_selected_states_batch_simulation()
+    # plot_dimer_survival_prob_selected_states_batch_simulation()
 
     # plot T, T' phase diagram for dimer
     # analyze_dilution_factor_and_T_T_prime_phase_diagram_main()
@@ -32,3 +34,6 @@ def Analyze_dimer_code_main():
 
     # generate sampling state for simulation.
     # generate_sampling_state_info_file()
+
+    # analyze nonstatistical states
+    analyze_nonstatistical_states()

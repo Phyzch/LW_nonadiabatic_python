@@ -1,7 +1,5 @@
 from util import *
 
-from Analyze_dimer_code.Analyze_dimer_batch_siimulation_survival_prob_auxiliary_func import \
-    compute_dimer_state_dilution_factor
 from dilution_factor_with_respect_to_barrier_height import compute_barrier_height
 from Analyze_dimer_code.Analyze_dimer_batch_siimulation_survival_prob_auxiliary_func import *
 
@@ -22,7 +20,7 @@ def analyze_dilution_factor_vs_energy_V0_3050():
 
     :return:
     '''
-    save_bool = True
+    save_bool = False
     parent_folder = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/BChl_dimer_model/" \
                     "5_mode/batch_simulation_Bigwood_scaling/batch_simulation_output/"
 
