@@ -25,7 +25,36 @@ def estimate_transition_factor_subroutine(Q, V0, scaling_factor,  frequency_list
 
     return Tq
 
-def estimate_transition_factor_with_freq_and_energy_dimer(energy, frequency_list, scaling_factor):
+def estimate_transition_factor_temperature_subroutine(Q, V0, scaling_factor,  frequency_list, temperature ):
+    '''
+    V_{Q} = scaling_factor^{Q} * V0
+    :param Q:
+    :param V0:
+    :param scaling_factor:
+    :param temperature: in unit of cm^{-1}
+    :return:
+    '''
+    dof = len(frequency_list)
+    # connectivity K
+    K = np.power(2 * dof, Q) /np.math.factorial(Q)
+
+    # local density of state
+    omega_rms = np.sqrt(np.mean(np.power(frequency_list, 2)))
+    Dq = 1/ (omega_rms * np.power(Q,1/2) * np.pi)
+
+    # coupling strength
+    average_mode_quanta = 1/( np.exp(frequency_list/temperature) - 1)
+    # if average mode quanta in given mode < 1, take it as 1.
+    # average_mode_quanta = np.array([x if x>1 else 1 for x in average_mode_quanta ])
+    M = np.prod( np.power(average_mode_quanta , 1/dof) )
+    # M = energy / (dof * omega_rms)
+    Vq = V0 * np.power(scaling_factor , Q) * np.power(M, Q/2)
+
+    Tq = np.sqrt(2 * np.pi / 3 ) * K * Dq * Vq
+
+    return Tq
+
+def estimate_transition_factor_with_freq_and_energy_dimer(energy, frequency_list, scaling_factor , equal_energy_assumption = True):
     '''
     choose formula for coupling Vq using Bigwood , Leitner, Gruebele, Wolynes 1998
         # here we assume equal energy in each monomer.
@@ -42,7 +71,11 @@ def estimate_transition_factor_with_freq_and_energy_dimer(energy, frequency_list
     # V0 = V3 / np.power(scaling_factor ,3)
 
     #  here we assume equal energy in each monomer.
-    monomer_energy = energy / 2
+    if equal_energy_assumption == True:
+        monomer_energy = energy / 2
+    else:
+        # assume one monomer is at ground state.
+        monomer_energy = energy
 
     # cubic order
     Q = 3
@@ -54,9 +87,41 @@ def estimate_transition_factor_with_freq_and_energy_dimer(energy, frequency_list
 
     Tq = Tq3 + Tq4
 
+    if equal_energy_assumption:
+        dimer_Tq = Tq * 2
+    else:
+        # one monomer is at ground state.
+        dimer_Tq = Tq
+
+    return dimer_Tq
+
+def estimate_transition_factor_with_freq_and_temperature_dimer(temperature, frequency_list, scaling_factor ):
+    '''
+    choose formula for coupling Vq using Bigwood , Leitner, Gruebele, Wolynes 1998
+        # here we assume equal energy in each monomer.
+
+    :return:
+    '''
+    # scaling factor: (use formula in 1998 PNAS Bigwood , Leitner, Gruebele, Wolynes)
+    # geometric_mean_freq = np.prod(np.power(frequency_list , 1/dof))
+    # scaling_factor = 1/270 * np.sqrt( geometric_mean_freq )
+
+    V0 = 3050
+
+    # cubic order
+    Q = 3
+    Tq3 = estimate_transition_factor_temperature_subroutine(Q, V0, scaling_factor, frequency_list, temperature)
+
+    # quartic coupling
+    Q = 4
+    Tq4 = estimate_transition_factor_temperature_subroutine(Q, V0, scaling_factor, frequency_list, temperature)
+
+    Tq = Tq3 + Tq4
+
     dimer_Tq = Tq * 2
 
     return dimer_Tq
+
 
 def estimate_transition_energy(energy, frequency_list , T_prime, scaling_factor):
     '''

@@ -12,7 +12,10 @@ def analyze_dilution_factor_with_anharmonic_T_dimer_main():
     # analyze_dilution_factor_with_anharmonic_T_V0_300_dimer()
 
     # V0 = 3050, a = geometric mean of 'a' for each mode
-    analyze_dilution_factor_with_anharmonic_T_V0_3050_dimer()
+    # analyze_dilution_factor_with_anharmonic_T_V0_3050_dimer()
+
+    # V0 = 3050, a = geometric mean of 'a' for each mode. energy in single monomer.
+    analyze_dilution_factor_with_anharmonic_T_V0_3050_dimer_energy_in_one_monomer()
 
 
 def analyze_dilution_factor_with_anharmonic_T_V0_3050_dimer():
@@ -35,6 +38,27 @@ def analyze_dilution_factor_with_anharmonic_T_V0_3050_dimer():
 
     analyze_dilution_factor_with_anharmonic_T_dimer_subroutine(file_path_list, V0, scaling_factor, save_bool, folder_path)
 
+def  analyze_dilution_factor_with_anharmonic_T_V0_3050_dimer_energy_in_one_monomer():
+    '''
+
+    :return:
+    '''
+    V0 = 3050
+    frequency_list =  np.array([890, 727, 345, 1117, 1158])
+    dof = len(frequency_list)
+
+    scaling_factor_list = np.sqrt(frequency_list) / 270
+    scaling_factor = np.prod( np.power(scaling_factor_list , 1/dof) )
+
+    save_bool = False
+    folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/BChl_dimer_model/5_mode/" \
+                  "batch_simulation_Bigwood_scaling/batch_simulation_energy_in_one_monomer/output_file"
+
+    file_path = "Vt=0_high_energy_dE=1500"
+    file_path_list = [file_path]
+    file_path_list = [os.path.join(folder_path, path) for path in file_path_list]
+
+    analyze_dilution_factor_with_anharmonic_T_dimer_subroutine(file_path_list, V0, scaling_factor, save_bool, folder_path)
 
 def analyze_dilution_factor_with_anharmonic_T_V0_300_dimer():
     '''
@@ -91,6 +115,7 @@ def analyze_dilution_factor_with_anharmonic_T_dimer_subroutine(file_path_list, V
     ax.set_yscale('log')
 
     ax.set_xlim([0.1 , np.max(T_list) + 0.5])
+    ax.set_ylim([np.min(dilution_factor_list) / 1.5 , 1.2])
 
     plt.show()
 

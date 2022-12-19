@@ -6,7 +6,7 @@ def analyze_nonstatistical_states():
 
     :return:
     '''
-
+    matplotlib.rcParams.update({'font.size': 14})
     find_out_localized_state_at_high_energy()
 
     # find_out_extended_state_at_low_energy()
@@ -22,17 +22,20 @@ def find_out_localized_state_at_high_energy():
     state_num, nmode, state_energy, monomer1_quantum_num, monomer2_quantum_num, survival_prob_list,\
         time_list = Read_dimer_survival_prob_all_states(file_path)
 
-    localized_state_high_energy = [index for index in range(state_num) if (dilution_factor_all_states[index] > 0.1 and
-                                                                           state_energy[index] > 20000) ]
+    # localized_state_high_energy = [index for index in range(state_num) if (dilution_factor_all_states[index] > 0.1 and
+    #                                                                        state_energy[index] > 20000) ]
 
-    # localized_state_high_energy = [index for index in range(state_num) if (dilution_factor_all_states[index] < 0.01 and
-    #                                                                        state_energy[index] < 25000) ]
+    localized_state_high_energy = [index for index in range(state_num) if (dilution_factor_all_states[index] < 0.01 and
+                                                                           state_energy[index] < 25000) ]
 
     print("index: " + str(localized_state_high_energy))
 
     for i in range(len(localized_state_high_energy)):
         monomer1 = monomer1_quantum_num[ localized_state_high_energy[i] ]
         monomer2 = monomer2_quantum_num [localized_state_high_energy[i]]
+        dilution_factor = dilution_factor_all_states[localized_state_high_energy[i] ]
+        print( "v1=" + str(monomer1) + "  v2=" + str(monomer2) + "  $\sigma=$" + str(dilution_factor) )
+
         es1, es2 = compute_edge_factor_ei(monomer1, monomer2)
         print( str(monomer1) + "   " + str(monomer2) )
         es_dimer = [round(es1,3),  round(es2,3)]
@@ -57,7 +60,7 @@ def find_out_localized_state_at_high_energy():
     # ax.plot(time_list, survival_prob_list[index], label = label , linewidth = 2)
 
     ax.legend(loc = 'best')
-    ax.set_yscale('log')
+    # ax.set_yscale('log')
 
     plt.show()
 

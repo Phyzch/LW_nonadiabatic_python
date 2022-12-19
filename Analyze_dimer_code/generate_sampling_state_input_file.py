@@ -8,18 +8,19 @@ def generate_sampling_state_info_file():
     :param folder_path:
     :return:
     '''
-    folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/BChl_dimer_model/5_mode/batch_simulation_Bigwood_scaling/input/"
+    folder_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/BChl_dimer_model/5_mode/" \
+                  "batch_simulation_Bigwood_scaling/batch_simulation_energy_in_one_monomer/input/"
     file_name = "sampling_state_info.txt"
     file_path = os.path.join(folder_path, file_name)
 
     sampling_state_num = 10
     monomer_mode_num = 5
 
-    nmax_sampling_list = np.array([ 6, 6, 6, 6 , 6 ])
-    nmin_sampling_list = np.array([ 2,2,2,2,2,2])
+    nmax_sampling_list = np.array([ 8, 8, 8, 8 , 8 ])
+    nmin_sampling_list = np.array([ 3,3,3,3,3,3])
 
-    # nmax_sampling_list = np.array([5,5,5,5,5,5])
-    # nmin_sampling_list = np.array([0,0,0,0,0,0])
+    # nmax_sampling_list = np.array([5,5,5,5,5])
+    # nmin_sampling_list = np.array([2,2,2,2,2])
 
     upper_energy_cutoff = 10000
     lower_energy_cutoff = 8000
@@ -34,8 +35,8 @@ def generate_sampling_state_info_file():
     V0 = 3050
     scaling_factor_list = np.sqrt(frequency_list) / 270
     scaling_factor_geometric_mean = np.prod( np.power(scaling_factor_list , 1 / monomer_mode_num))
-    lower_T_cutoff = 1.5
-    upper_T_cutoff = 3
+    lower_T_cutoff = 5
+    upper_T_cutoff = 20
     range_num = 1
 
     dimer_state_list = []
@@ -109,14 +110,14 @@ def generate_random_sampling_state_using_anharmonic_transition_factor_T(sampling
     dimer_state_list = []
     T_dimer_list = []
     while len(dimer_state_list) < sampling_state_num:
-        dimer_state = []
         monomer_state1 = []
         for j in range(monomer_mode_num):
             monomer_state1.append( round( (nmax_sampling_list[j] - nmin_sampling_list[j]) * random.random() ) +  nmin_sampling_list[j] )
 
         monomer_state2 = []
         for j in range(monomer_mode_num):
-            monomer_state2.append( round( nmax_sampling_list[j] * random.random()  ) )
+            # monomer_state2.append( round( nmax_sampling_list[j] * random.random()  ) )
+            monomer_state2.append(0)
 
         dimer_state = [monomer_state1, monomer_state2]
 

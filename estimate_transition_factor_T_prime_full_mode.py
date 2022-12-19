@@ -4,9 +4,10 @@ estimate nonadiabatic transition factor T' for 50 modes BChl. as function of Vt
 from util import *
 from scipy.optimize import root
 from Overlap_of_displaced_state import effective_num_coupling_submodule
-from estimate_transition_factor_T_full_mode import  estimate_transition_energy,estimate_transition_factor_with_freq_and_energy_dimer
+from estimate_transition_factor_T_full_mode import  estimate_transition_energy,estimate_transition_factor_with_freq_and_energy_dimer, \
+estimate_transition_factor_with_freq_and_temperature_dimer
 
-def estimate_T_prime_prefactor_subroutine_dimer(EV_coupling_alpha_list, frequency_list, energy = 0):
+def estimate_T_prime_prefactor_subroutine_dimer(EV_coupling_alpha_list, frequency_list, energy = 0, equal_energy_assumption = True):
     '''
      T_prime = Vt * prefactor.
      Here pre_factor is computed here.
@@ -22,21 +23,84 @@ def estimate_T_prime_prefactor_subroutine_dimer(EV_coupling_alpha_list, frequenc
     dof = len(frequency_list)
 
     # at very low energy, we focus on Ki for quantum number n = 0.
-    # energy is energy for dimer.
-    qn = round( (energy/2) / (dof * omega_rms) )
+    # energy here is energy for dimer.
+    if equal_energy_assumption:
+        # assume equal energy in each monomer
+        qn = round( (energy/2) / (dof * omega_rms) )
 
-    Ki_list = np.zeros([dof])
-    for i in range(dof):
-        alpha = EV_coupling_alpha_list[i]
-        Ki = effective_num_coupling_submodule(alpha, qn)
-        Ki_list[i] = Ki
+        Ki_list = np.zeros([dof])
+        for i in range(dof):
+            alpha = EV_coupling_alpha_list[i]
+            Ki = effective_num_coupling_submodule(alpha, qn)
+            Ki_list[i] = Ki
 
-    Kt = np.prod(Ki_list)
+        Kt = np.prod(Ki_list)
 
-    Kt_dimer = np.power(Kt, 2)
+        Kt_dimer = np.power(Kt, 2)
+
+    else:
+        # assume energy concentrated in one monomer.
+        qn1 = round(energy / (dof * omega_rms))
+
+        Ki_list1 = np.zeros([dof])
+        for i in range(dof):
+            alpha = EV_coupling_alpha_list[i]
+            Ki = effective_num_coupling_submodule(alpha, qn1)
+            Ki_list1[i] = Ki
+        Kt1 = np.prod(Ki_list1)
+
+        Ki_list2 = np.zeros([dof])
+        qn2 = 0
+        for i in range(dof):
+            alpha = EV_coupling_alpha_list[i]
+            Ki = effective_num_coupling_submodule(alpha, qn2)
+            Ki_list2[i] = Ki
+        Kt2 = np.prod(Ki_list2)
+        Kt_dimer = Kt1 * Kt2
 
     # estimate the nonadiabatic transition factor T_prime
     T_prime_prefactor = np.sqrt(2 * np.pi /3) * Dq * np.sqrt(Kt_dimer)
+
+    return T_prime_prefactor
+
+def estimate_T_prime_prefactor_temperature_subroutine_dimer(EV_coupling_alpha_list, frequency_list, temperature):
+    '''
+
+    :param EV_coupling_alpha_list:
+    :param frequency_list:
+    :param temperature:
+    :return:
+    '''
+    # Estimate local density of state Dq
+    omega_rms = np.sqrt(np.mean(np.power(frequency_list, 2)))
+    Dq = 1 / (np.pi * omega_rms)
+
+    # compute Kt: connectivity
+    dof = len(frequency_list)
+
+    # compute Kt
+    quantum_number_list = np.array(range(10))
+    qn_len = len(quantum_number_list)
+    Ki_sqrt_list = []
+    for mode_index in range(dof):
+        frequency = frequency_list[mode_index]
+        alpha = EV_coupling_alpha_list[mode_index]
+        thermal_qn_prob = np.exp(-quantum_number_list * frequency/temperature) * (1 - np.exp(-frequency / temperature))
+        Ki_n_list = []
+        for j in range(qn_len):
+            qn = quantum_number_list[j]
+            Ki_n = effective_num_coupling_submodule(alpha,qn)
+            Ki_n_list.append(Ki_n)
+
+        Ki_n_sqrt_list = np.sqrt(Ki_n_list)
+        Ki_sqrt = np.sum( thermal_qn_prob * Ki_n_sqrt_list ) # average over sqrt(Ki_n)
+        Ki_sqrt_list.append(Ki_sqrt)
+
+    Kn_sqrt = np.prod(Ki_sqrt_list)
+    Kn_sqrt_dimer = Kn_sqrt * Kn_sqrt
+
+    # estimate the nonadiabatic transition factor T_prime
+    T_prime_prefactor = np.sqrt(2 * np.pi /3) * Dq * Kn_sqrt_dimer
 
     return T_prime_prefactor
 
@@ -236,7 +300,58 @@ def plot_E_transition_factor_subroutine(scaling_factor, Vt, Huang_Rhys_factor, f
     plt.show()
 
 
-def plot_E_transition_factor_for_5_mode_BChl():
+def plot_temperature_transition_factor_subroutine(scaling_factor, Vt, Huang_Rhys_factor, frequency_list, fig_path, save_bool):
+    '''
+
+    :param V0: 3050 according to fitting.
+    :param scaling_factor: scaling factor in Bigwood 1998 paper
+    :param Vt:  nonadiabatic coupling strength
+    :param Huang_Rhys_factor: EV coupling strength
+    :return:
+    '''
+    matplotlib.rcParams.update({'font.size': 20})
+
+    data_num = 20
+    temperature_list = np.linspace(1, 3000, data_num)
+    unit_transform = 208 / 300 # from K to cm^{-1}
+    temperature_list_unit_wavenumber = unit_transform * temperature_list
+
+    Tq_list = np.zeros([data_num])
+    T_prime_list =  np.zeros([data_num])
+
+    EV_coupling_alpha = np.sqrt(Huang_Rhys_factor)
+
+
+    for i in range(data_num):
+        temperature = temperature_list_unit_wavenumber[i]
+        Tq = estimate_transition_factor_with_freq_and_temperature_dimer(temperature,frequency_list,scaling_factor)
+        Tq_list[i] = Tq
+
+        T_prime_prefactor = estimate_T_prime_prefactor_temperature_subroutine_dimer(EV_coupling_alpha, frequency_list, temperature)
+        T_prime = Vt * T_prime_prefactor
+        T_prime_list[i] = T_prime
+
+    Tq_T_prime_sum_list = Tq_list + T_prime_list
+
+    fig = plt.figure(figsize=(10, 10))
+    spec = gridspec.GridSpec(nrows=1, ncols=1, figure=fig)
+    ax = fig.add_subplot(spec[0, 0])
+    ax.plot(temperature_list, Tq_list, linewidth=4)
+    ax.plot(temperature_list, Tq_T_prime_sum_list , linewidth = 4)
+
+    ax.set_xlabel('temperature(K)')
+    ax.set_ylabel("T or (T + T')")
+
+    # ax.axhline(y=1 , linewidth = 3, color = 'black')
+
+    if save_bool:
+        fig_name = "transition factor T, T' vs temperature.svg"
+        fig_name = os.path.join(fig_path, fig_name)
+        fig.savefig(fig_name)
+
+    plt.show()
+
+def plot_transition_factor_for_5_mode_BChl():
     '''
 
     :return:
@@ -254,16 +369,17 @@ def plot_E_transition_factor_for_5_mode_BChl():
     V0 = 3050
     Vt = 363
 
-    fig_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/result 2022.10.06/paper fig/full_mode_T_T'_estimate/5 mode estimate/"
-    save_bool = False
-    plot_E_transition_factor_subroutine(scaling_factor_estimate, Vt, Huang_Rhys_factor, frequency_list, fig_path, save_bool)
+    fig_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/result 2022.10.06/paper fig/full_mode_T_T'_estimate/dimer_case_Bigwood formula/"
+    save_bool = True
+    # plot_E_transition_factor_subroutine(scaling_factor_estimate, Vt, Huang_Rhys_factor, frequency_list, fig_path, save_bool)
 
-def plot_E_transition_factor_for_full_mode_BChl():
+    plot_temperature_transition_factor_subroutine(scaling_factor_estimate, Vt, Huang_Rhys_factor, frequency_list, fig_path, save_bool)
+def plot_transition_factor_for_full_mode_BChl():
     '''
 
     :return:
     '''
-    save_bool = False
+    save_bool = True
     fig_path = "/home/phyzch/Presentation/LW_electronic_model/2022 result/spin_boson_LW/result 2022.10.06/paper fig/full_mode_T_T'_estimate/dimer_case_Bigwood formula/"
     frequency_list = np.array([  84,  167,  183,  191,  214,  239,  256,  345,  368,  388,  407,
         423,  442,  473,  506,  565,  587,  623,  684,  696,  710,  727,
@@ -282,6 +398,37 @@ def plot_E_transition_factor_for_full_mode_BChl():
 
     Vt = 363
 
-    plot_E_transition_factor_subroutine(scaling_factor_estimate, Vt, Huang_Rhys_factor, frequency_list, fig_path, save_bool)
+    # plot_E_transition_factor_subroutine(scaling_factor_estimate, Vt, Huang_Rhys_factor, frequency_list, fig_path, save_bool)
 
-# plot_E_transition_factor_for_full_mode_BChl()
+    plot_temperature_transition_factor_subroutine(scaling_factor_estimate, Vt, Huang_Rhys_factor, frequency_list, fig_path,
+                                                  save_bool)
+
+def compute_thermal_energy_BChl_full_mode():
+    '''
+
+    :return:
+    '''
+    frequency_list = np.array([  84,  167,  183,  191,  214,  239,  256,  345,  368,  388,  407,
+        423,  442,  473,  506,  565,  587,  623,  684,  696,  710,  727,
+        776,  803,  845,  858,  890,  915,  967,  980, 1001, 1019, 1066,
+       1089, 1105, 1117, 1137, 1158, 1180, 1190, 1211, 1229, 1252, 1289,
+       1378, 1466, 1519, 1539, 1648, 1680])
+
+    T = 208.37 # 300K, in unit of cm^{-1}
+    # T = 2500
+
+    energy_in_each_mode = frequency_list / (np.exp(frequency_list / T) - 1)
+    energy_in_monomer = np.sum(energy_in_each_mode)
+
+    print("energy in monomer (full mode):" + str(energy_in_monomer))
+
+    frequency_list = np.array([890, 727, 345, 1117, 1158])
+    energy_in_each_mode = frequency_list / (np.exp(frequency_list / T) - 1)
+    energy_in_monomer = np.sum(energy_in_each_mode)
+    print("energy in monomer(5 mode): " + str(energy_in_monomer))
+
+
+
+# plot_transition_factor_for_full_mode_BChl()
+# plot_transition_factor_for_5_mode_BChl()
+# compute_thermal_energy_BChl_full_mode()
